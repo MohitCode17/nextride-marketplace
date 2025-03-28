@@ -58,7 +58,7 @@ export default function Home() {
       <section className="py-12 bg-gray-50">
         <div className="px-4">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="text-2xl font-bold">Browse by make</h2>
+            <h2 className="text-2xl font-bold">Browse by company</h2>
             <Button variant={"ghost"} className={"flex items-center"} asChild>
               <Link href={"/cars"}>
                 View All <ChevronRight className="ml-1 h-4 w-4" />
@@ -101,10 +101,10 @@ export default function Home() {
                 <Car className="h-8 w-8" />
               </div>
 
-              <h3 className="text-xl font-bold mb-2">Wide Selection</h3>
+              <h3 className="text-xl font-bold mb-2">Massive Car Collection</h3>
               <p className="text-gray-600">
-                Thousands of verified vehicles from trusted dealerships and
-                private sellers.
+                Discover an extensive range of premium cars from verified
+                dealers and private sellers—your perfect ride is waiting.
               </p>
             </div>
 
@@ -113,10 +113,10 @@ export default function Home() {
                 <Calendar className="h-8 w-8" />
               </div>
 
-              <h3 className="text-xl font-bold mb-2">Easy Test Driver</h3>
+              <h3 className="text-xl font-bold mb-2">Seamless Test Drives</h3>
               <p className="text-gray-600">
-                Book a test drive online in minutes, with flexible scheduling
-                options.
+                Book a test drive with just a few clicks—schedule at your
+                convenience and hit the road in style.
               </p>
             </div>
 
@@ -125,9 +125,10 @@ export default function Home() {
                 <Shield className="h-8 w-8" />
               </div>
 
-              <h3 className="text-xl font-bold mb-2">Secure Process</h3>
+              <h3 className="text-xl font-bold mb-2">Trusted & Secure</h3>
               <p className="text-gray-600">
-                Verified listings and secure booking process for peace of mind.
+                Feel confident with our verified listings and secure booking
+                process—your peace of mind is our priority.
               </p>
             </div>
           </div>
