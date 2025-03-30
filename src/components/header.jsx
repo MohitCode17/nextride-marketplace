@@ -3,9 +3,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { ArrowLeft, CarFront } from "lucide-react";
+import { checkUser } from "@/lib/checkUser";
 
 const Header = async ({ isAdminPage = false }) => {
-  const isAdmin = false;
+  // CHECK IS USER IS PRESENT IN DATABASE, ELSE CREATE IT.
+  const user = await checkUser();
+  const isAdmin = user?.role === "ADMIN";
 
   return (
     <header className="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b">
