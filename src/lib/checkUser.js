@@ -15,8 +15,6 @@ export const checkUser = async () => {
       },
     });
 
-    console.log(loggedInUser);
-
     if (loggedInUser) {
       return loggedInUser;
     }
