@@ -30,6 +30,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import useFetch from "@/hooks/use-fetch";
 import { addCar } from "@/actions/cars";
+import { useRouter } from "next/navigation";
 
 // FORM CONFIGURATION
 const fuelTypes = ["Petrol", "Diesel", "Electric", "Hybrid", "Plug-in Hybrid"];
@@ -73,6 +74,7 @@ const AddCarForm = () => {
   const [uploadedImages, setUploadedImages] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [imageError, setImageError] = useState("");
+  const router = useRouter();
 
   // CALL CUSTOM HOOK TO ADD CAR IN DATABASE
   const {
@@ -85,8 +87,9 @@ const AddCarForm = () => {
   useEffect(() => {
     if (addCarResult?.success) {
       toast.success("Car added successfully.");
+      router.push("/admin/cars");
     }
-  }, [addCarResult, addCarLoading]);
+  }, [addCarResult, addCarLoading, router]);
 
   // DROP MULTI IMAGE LOGIC(MANUAL)
   const onMultiImageDrop = (acceptedFiles) => {
@@ -167,7 +170,6 @@ const AddCarForm = () => {
       setImageError("Please upload at least one image");
       return;
     }
-    console.log("Car Data", data);
 
     const carData = {
       ...data,
