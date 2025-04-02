@@ -124,10 +124,12 @@ export async function processCarImageWithAI(file) {
 
 export async function addCar({ carData, images }) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
+    console.log("User Id", userId);
+
     if (!userId) throw new Error("Unauthorized");
 
-    const user = await db.findUnique({
+    const user = await db.user.findUnique({
       where: { clerkUserId: userId },
     });
 
@@ -216,6 +218,7 @@ export async function addCar({ carData, images }) {
       success: true,
     };
   } catch (error) {
-    throw new Error("Error adding car: ", error.message);
+    console.log(error);
+    throw new Error("Error adding car: ", error);
   }
 }

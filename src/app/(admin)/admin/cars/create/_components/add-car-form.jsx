@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,6 +28,8 @@ import { toast } from "sonner";
 import { Loader2, Upload, X } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import useFetch from "@/hooks/use-fetch";
+import { addCar } from "@/actions/cars";
 
 // FORM CONFIGURATION
 const fuelTypes = ["Petrol", "Diesel", "Electric", "Hybrid", "Plug-in Hybrid"];
@@ -72,7 +74,21 @@ const AddCarForm = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [imageError, setImageError] = useState("");
 
-  // DROP MULTI IMAGE LOGIC
+  // CALL CUSTOM HOOK TO ADD CAR IN DATABASE
+  const {
+    loading: addCarLoading,
+    fn: addCarFn,
+    data: addCarResult,
+  } = useFetch(addCar);
+
+  // HANDLE SUCCESSFUL CAR ADDITION(MANUAL)
+  useEffect(() => {
+    if (addCarResult?.success) {
+      toast.success("Car added successfully.");
+    }
+  }, [addCarResult, addCarLoading]);
+
+  // DROP MULTI IMAGE LOGIC(MANUAL)
   const onMultiImageDrop = (acceptedFiles) => {
     const validFiles = acceptedFiles.filter((file) => {
       if (file.size > 5 * 1024 * 1024) {
@@ -140,9 +156,32 @@ const AddCarForm = () => {
     },
   });
 
-  // HANDLE REMOVE IMAGE
+  // HANDLE REMOVE IMAGE(MANUAL)
   const removeImage = (index) => {
     setUploadedImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // HANDLE FORM SUBMIT(MANUAL)
+  const onSubmit = async (data) => {
+    if (uploadedImages.length === 0) {
+      setImageError("Please upload at least one image");
+      return;
+    }
+    console.log("Car Data", data);
+
+    const carData = {
+      ...data,
+      year: parseInt(data.year),
+      price: parseFloat(data.price),
+      mileage: parseInt(data.mileage),
+      seats: data.seats ? parseInt(data.seats) : null,
+    };
+
+    // CALL THE ADDCAR FUNCTION WITH OUR USEFETCH HOOK
+    await addCarFn({
+      carData,
+      images: uploadedImages,
+    });
   };
 
   return (
@@ -167,7 +206,7 @@ const AddCarForm = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form className="space-y-6">
+              <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {/* MAKE */}
                   <div className="space-y-2">
@@ -490,9 +529,9 @@ const AddCarForm = () => {
                 <Button
                   type="submit"
                   className={"w-full md:w-auto"}
-                  disabled={false}
+                  disabled={addCarLoading}
                 >
-                  {false ? (
+                  {addCarLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Adding
                       cars...
