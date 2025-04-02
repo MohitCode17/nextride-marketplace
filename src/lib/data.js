@@ -81,3 +81,27 @@ export const faqItems = [
       "All listed vehicles are verified for accuracy and quality. We ensure transparent information and detailed reports.",
   },
 ];
+
+// FORM CONFIGURATION - Constants moved to a separate file for reusability
+
+export const fuelTypes = [
+  "Petrol",
+  "Diesel",
+  "Electric",
+  "Hybrid",
+  "Plug-in Hybrid",
+];
+
+export const transmissions = ["Automatic", "Manual", "Semi-Automatic"];
+
+export const bodyTypesVal = [
+  "SUV",
+  "Sedan",
+  "Hatchback",
+  "Convertible",
+  "Coupe",
+  "Wagon",
+  "Pickup",
+];
+
+export const carStatuses = ["AVAILABLE", "UNAVAILABLE", "SOLD"];
