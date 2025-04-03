@@ -182,7 +182,7 @@ export async function addCar({ carData, images }) {
       }
 
       // GET THE PUBLIC URL FOR UPLOADED FILE
-      const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/car-images/${filePath}`; // disable cache in config
+      const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/nextride-car-images/${filePath}`; // disable cache in config
 
       imageUrls.push(publicUrl);
     }

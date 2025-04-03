@@ -7,3 +7,10 @@ export const serialzeCarData = (car, wishlisted = false) => {
     wishlisted: wishlisted,
   };
 };
+
+export const formatCurrency = (amount) => {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+  }).format(amount);
+};
