@@ -1,9 +1,17 @@
 "use client";
 
-import { getCars, updateCarStatus } from "@/actions/cars";
+import { deleteCar, getCars, updateCarStatus } from "@/actions/cars";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,10 +45,13 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const CarsList = () => {
   const router = useRouter();
   const [search, setSearch] = useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [carToDelete, setCarToDelete] = useState(null);
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -83,10 +94,18 @@ const CarsList = () => {
     error: updateError,
   } = useFetch(updateCarStatus);
 
+  // DELETE CAR
+  const {
+    loading: deletingCar,
+    fn: deleteCarFn,
+    data: deleteResult,
+    error: deleteError,
+  } = useFetch(deleteCar);
+
   // INITIAL FETCH FOR GETTING CARS WHEN COMPONENT MOUNT
   useEffect(() => {
     fetchCars(search);
-  }, [search, updateResult]);
+  }, [search]);
 
   // TOGGLE FEATURED STATUS
   const handleToggleFeatured = async (car) => {
@@ -98,6 +117,43 @@ const CarsList = () => {
   const handleStatusUpdate = async (car, newStatus) => {
     await updateCarStatusFn(car.id, { status: newStatus });
   };
+
+  // Handle delete car
+  const handleDeleteCar = async () => {
+    if (!carToDelete) return;
+
+    await deleteCarFn(carToDelete.id);
+    setDeleteDialogOpen(false);
+    setCarToDelete(null);
+  };
+
+  // HANDLE SUCCESSFULL
+  useEffect(() => {
+    if (deleteResult?.success) {
+      toast.success("Car deleted successfully");
+      fetchCars(search);
+    }
+
+    if (updateResult?.success) {
+      toast.success("Car updated successfully");
+      fetchCars(search);
+    }
+  }, [updateResult, deleteResult, search]);
+
+  // HANDLE ERRORS
+  useEffect(() => {
+    if (carsError) {
+      toast.error("Failed to load cars");
+    }
+
+    if (deleteError) {
+      toast.error("Failed to delete car");
+    }
+
+    if (updateError) {
+      toast.error("Failed to update car");
+    }
+  }, [carsError, deleteError, updateError]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -238,10 +294,10 @@ const CarsList = () => {
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                               className="text-red-600"
-                              // onClick={() => {
-                              //   setCarToDelete(car);
-                              //   setDeleteDialogOpen(true);
-                              // }}
+                              onClick={() => {
+                                setCarToDelete(car);
+                                setDeleteDialogOpen(true);
+                              }}
                             >
                               <Trash2 className="mr-2 h-4 w-4" />
                               Delete
@@ -272,6 +328,43 @@ const CarsList = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* DELETE CONFIRMATION DIALOG */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete {carToDelete?.make}{" "}
+              {carToDelete?.model} ({carToDelete?.year})? This action cannot be
+              undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={deletingCar}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteCar}
+              disabled={deletingCar}
+            >
+              {deletingCar ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete Car"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
