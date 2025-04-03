@@ -264,3 +264,108 @@ export async function getCars(search = "") {
     };
   }
 }
+
+export async function deleteCar(id) {
+  try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    // FETCH THE CARS AND GET IMAGES
+    const car = await db.car.findUnique({
+      where: { id },
+      select: { images: true },
+    });
+
+    if (!car) {
+      return {
+        success: false,
+        error: "Car not found",
+      };
+    }
+
+    // DELETE THE CAR FROM DB
+    await db.car.delete({
+      where: { id },
+    });
+
+    // DELETE IMAGES FROM SUPABASE STORAGE
+    try {
+      const cookieStore = await cookies();
+      const supabase = createClient(cookieStore);
+
+      // EXTRACT FILE PATH FROM IMAGE URL
+      const filePaths = car.images
+        .map((imageUrl) => {
+          const url = new URL(imageUrl);
+          const pathMatch = url.pathname.match(/\/nextride-car-images\/(.*)/);
+          return pathMatch ? pathMatch[1] : null;
+        })
+        .filter(Boolean);
+
+      console.log("filePaths", filePaths);
+
+      // DELETE FILES FROM STORAGE IF PATHS WERE EXTRACTED
+      if (filePaths.length > 0) {
+        const { error } = await supabase.storage
+          .from("nextride-car-images")
+          .remove(filePaths);
+
+        if (error) {
+          console.error("Error deleting images:", error);
+          // CONTINUE EVEN IF IMAGE DELETION FAILS
+        }
+      }
+    } catch (storageError) {
+      console.error("Error with storage operations:", storageError);
+    }
+
+    // REVALIDATE THE CARS LIST PAGE
+    revalidatePath("/admin/cars");
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error deleting car:", error);
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+}
+
+export async function updateCarStatus(id, { status, featured }) {
+  try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const updateData = {};
+
+    if (status !== undefined) {
+      updateData.status = status;
+    }
+
+    if (featured !== undefined) {
+      updateData.featured = featured;
+    }
+
+    // UPDATE THE CAR
+    await db.car.update({
+      where: { id },
+      data: updateData,
+    });
+
+    // REVALIDATE THE CARS LIST PAGE
+    revalidatePath("/admin/cars");
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error updating car status:", error);
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+}
