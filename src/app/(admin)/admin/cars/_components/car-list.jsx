@@ -1,6 +1,6 @@
 "use client";
 
-import { getCars } from "@/actions/cars";
+import { getCars, updateCarStatus } from "@/actions/cars";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -75,10 +75,29 @@ const CarsList = () => {
     error: carsError,
   } = useFetch(getCars);
 
+  // UPDATE CAR
+  const {
+    loading: updatingCar,
+    fn: updateCarStatusFn,
+    data: updateResult,
+    error: updateError,
+  } = useFetch(updateCarStatus);
+
   // INITIAL FETCH FOR GETTING CARS WHEN COMPONENT MOUNT
   useEffect(() => {
     fetchCars(search);
-  }, [search]);
+  }, [search, updateResult]);
+
+  // TOGGLE FEATURED STATUS
+  const handleToggleFeatured = async (car) => {
+    console.log("Car Featured", car.featured);
+    await updateCarStatusFn(car.id, { featured: !car.featured });
+  };
+
+  // Handle STATUS CHANGE
+  const handleStatusUpdate = async (car, newStatus) => {
+    await updateCarStatusFn(car.id, { status: newStatus });
+  };
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -159,8 +178,8 @@ const CarsList = () => {
                           variant="ghost"
                           size="sm"
                           className="p-0 h-9 w-9"
-                          // onClick={() => handleToggleFeatured(car)}
-                          // disabled={updatingCar}
+                          onClick={() => handleToggleFeatured(car)}
+                          disabled={updatingCar}
                         >
                           {car.featured ? (
                             <Star className="h-5 w-5 text-amber-500 fill-amber-500" />
@@ -194,9 +213,9 @@ const CarsList = () => {
                               onClick={() =>
                                 handleStatusUpdate(car, "AVAILABLE")
                               }
-                              // disabled={
-                              //   car.status === "AVAILABLE" || updatingCar
-                              // }
+                              disabled={
+                                car.status === "AVAILABLE" || updatingCar
+                              }
                             >
                               Set Available
                             </DropdownMenuItem>
@@ -204,15 +223,15 @@ const CarsList = () => {
                               onClick={() =>
                                 handleStatusUpdate(car, "UNAVAILABLE")
                               }
-                              // disabled={
-                              //   car.status === "UNAVAILABLE" || updatingCar
-                              // }
+                              disabled={
+                                car.status === "UNAVAILABLE" || updatingCar
+                              }
                             >
                               Set Unavailable
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                            // onClick={() => handleStatusUpdate(car, "SOLD")}
-                            // disabled={car.status === "SOLD" || updatingCar}
+                              onClick={() => handleStatusUpdate(car, "SOLD")}
+                              disabled={car.status === "SOLD" || updatingCar}
                             >
                               Mark as Sold
                             </DropdownMenuItem>
