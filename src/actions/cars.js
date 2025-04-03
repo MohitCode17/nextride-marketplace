@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
+import { serialzeCarData } from "@/lib/helpers";
 
 async function fileToBase24(file) {
   const bytes = await file.arrayBuffer();
@@ -125,7 +126,6 @@ export async function processCarImageWithAI(file) {
 export async function addCar({ carData, images }) {
   try {
     const { userId } = await auth();
-    console.log("User Id", userId);
 
     if (!userId) throw new Error("Unauthorized");
 
@@ -220,5 +220,47 @@ export async function addCar({ carData, images }) {
   } catch (error) {
     console.log(error);
     throw new Error("Error adding car: ", error);
+  }
+}
+
+export async function getCars(search = "") {
+  try {
+    const { userId } = await auth();
+
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+
+    if (!user) throw new Error("User not found");
+
+    let where = {};
+
+    if (search) {
+      where.OR = [
+        { make: { contains: search, mode: "insensitive" } },
+        { model: { contains: search, mode: "insensitive" } },
+        { color: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
+    const cars = await db.car.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+    });
+
+    const serializedCars = cars.map(serialzeCarData);
+
+    return {
+      success: true,
+      data: serializedCars,
+    };
+  } catch (error) {
+    console.error("Error fetching cars:", error);
+    return {
+      success: false,
+      error: error.message,
+    };
   }
 }
