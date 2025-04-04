@@ -291,28 +291,30 @@ export async function deleteCar(id) {
     // DELETE IMAGES FROM SUPABASE STORAGE
     try {
       const cookieStore = await cookies();
-      const supabase = createClient(cookieStore);
+      const supabase = createClient(cookieStore); // Create Supabase client with authz
 
       // EXTRACT FILE PATH FROM IMAGE URL
       const filePaths = car.images
-        .map((imageUrl) => {
-          const url = new URL(imageUrl);
-          const pathMatch = url.pathname.match(/\/nextride-car-images\/(.*)/);
-          return pathMatch ? pathMatch[1] : null;
-        })
+        .map((imageUrl) =>
+          imageUrl.replace(
+            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/nextride-car-images/`,
+            ""
+          )
+        )
         .filter(Boolean);
 
-      console.log("filePaths", filePaths);
+      console.log("Extracted file paths:", filePaths);
 
       // DELETE FILES FROM STORAGE IF PATHS WERE EXTRACTED
       if (filePaths.length > 0) {
-        const { error } = await supabase.storage
+        const { data, error } = await supabase.storage
           .from("nextride-car-images")
           .remove(filePaths);
 
         if (error) {
-          console.error("Error deleting images:", error);
-          // CONTINUE EVEN IF IMAGE DELETION FAILS
+          console.error("Error deleting images from storage:", error.message);
+        } else {
+          console.log("Successfully deleted images:", data);
         }
       }
     } catch (storageError) {
