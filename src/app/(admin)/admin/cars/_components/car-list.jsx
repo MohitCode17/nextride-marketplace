@@ -157,6 +157,8 @@ const CarsList = () => {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
+
+    fetchCars(search);
   };
 
   return (
