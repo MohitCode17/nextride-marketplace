@@ -6,6 +6,7 @@ import { CarIcon, Heart, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
+import { formatCurrency } from "@/lib/helpers";
 
 const CarCard = ({ car }) => {
   const [isSaved, setIsSaved] = useState(car.wishlisted);
@@ -52,7 +53,7 @@ const CarCard = ({ car }) => {
           </h3>
 
           <span className="text-xl font-bold text-blue-600">
-            ${car.price.toLocaleString()}
+            {formatCurrency(car.price)}
           </span>
         </div>
 
