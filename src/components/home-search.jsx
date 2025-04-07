@@ -1,11 +1,13 @@
 "use client";
 
 import { Camera, Search, Upload } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import useFetch from "@/hooks/use-fetch";
+import { processImageSearch } from "@/actions/home";
 
 const HomeSearch = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -15,6 +17,13 @@ const HomeSearch = () => {
   const [isImageSearchActive, setIsImageSearchActive] = useState(false);
 
   const router = useRouter();
+
+  const {
+    loading: isProcessing,
+    fn: processImageFn,
+    data: processResult,
+    error: processError,
+  } = useFetch(processImageSearch);
 
   const onDrop = (acceptedFiles) => {
     const file = acceptedFiles[0];
@@ -62,7 +71,7 @@ const HomeSearch = () => {
     router.push(`/cars?search=${encodeURIComponent(searchTerm)}`);
   };
 
-  const handleImageSearch = (e) => {
+  const handleImageSearch = async (e) => {
     e.preventDefault();
     if (!searchImage) {
       toast.error("Please upload an image first");
@@ -70,7 +79,36 @@ const HomeSearch = () => {
     }
 
     // ADD THE AI LOGIC
+    await processImageFn(searchImage);
   };
+
+  // HANDLE AI SUCCESS RESULT
+  useEffect(() => {
+    if (processResult?.success) {
+      const params = new URLSearchParams();
+
+      // Add extracted params to the search
+      if (processResult.data.make) params.set("make", processResult.data.make);
+
+      if (processResult.data.bodyType)
+        params.set("bodyType", processResult.data.bodyType);
+
+      if (processResult.data.color)
+        params.set("color", processResult.data.color);
+
+      // Redirect to search results
+      router.push(`/cars?${params.toString()}`);
+    }
+  }, [processResult, router]);
+
+  // HANDLE ERROR AI RESPONSE
+  useEffect(() => {
+    if (processError) {
+      toast.error(
+        "Failed to analyze image: " + (processError.message || "Unknown error")
+      );
+    }
+  }, [processError]);
 
   return (
     <div>
@@ -147,8 +185,16 @@ const HomeSearch = () => {
               )}
             </div>
             {imagePreview && (
-              <Button type="submit" className="w-full" disabled={isUploading}>
-                {isUploading ? "Uploading..." : "Search with this Image"}
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isUploading || isProcessing}
+              >
+                {isUploading
+                  ? "Uploading..."
+                  : isProcessing
+                  ? "Analyzing image..."
+                  : "Search with this Image"}
               </Button>
             )}
           </form>

@@ -1,3 +1,5 @@
+"use server";
+
 import aj from "@/lib/arcjet";
 import { request } from "@arcjet/next";
 import { GoogleGenerativeAI } from "@google/generative-ai";
