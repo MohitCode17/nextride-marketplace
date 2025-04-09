@@ -5,12 +5,12 @@ import { db } from "@/lib/prisma";
 import { request } from "@arcjet/next";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-function serializeCarData(car) {
+function serializeRideData(ride) {
   return {
-    ...car,
-    price: car.price ? parseFloat(car.price.toString()) : 0,
-    createdAt: car.createdAt?.toISOString(),
-    updatedAt: car.updatedAt?.toISOString(),
+    ...ride,
+    price: ride.price ? parseFloat(ride.price.toString()) : 0,
+    createdAt: ride.createdAt?.toISOString(),
+    updatedAt: ride.updatedAt?.toISOString(),
   };
 }
 
@@ -20,9 +20,9 @@ async function fileToBase24(file) {
   return buffer.toString("base64");
 }
 
-export async function getFeaturedCars(limit = 3) {
+export async function getFeaturedRides(limit = 4) {
   try {
-    const cars = await db.car.findMany({
+    const rides = await db.ride.findMany({
       where: {
         featured: true,
         status: "AVAILABLE",
@@ -31,9 +31,9 @@ export async function getFeaturedCars(limit = 3) {
       orderBy: { createdAt: "desc" },
     });
 
-    return cars.map(serializeCarData);
+    return rides.map(serializeRideData);
   } catch (error) {
-    throw new Error("Error fetching featured cars:" + error.message);
+    throw new Error("Error fetching featured rides:" + error.message);
   }
 }
 
@@ -82,17 +82,17 @@ export async function processImageSearch(file) {
       },
     };
 
-    // DEFINE THE PROMPT FOR CAR SEARCH EXTRACTION
+    // DEFINE THE PROMPT FOR SEARCH EXTRACTION
     const prompt = `
-          Analyze this car image and extract the following information for a search query:
+          Analyze this bike, scooter, and EV image and extract the following information for a search query:
           1. Make (manufacturer)
-          2. Body type (SUV, Sedan, Hatchback, etc.)
+          2. Type (Cruiser, Sport, Commuter, etc.)
           3. Color
     
           Format your response as a clean JSON object with these fields:
           {
             "make": "",
-            "bodyType": "",
+            "bikeType": "",
             "color": "",
             "confidence": 0.0
           }
@@ -109,12 +109,12 @@ export async function processImageSearch(file) {
 
     // PARSE THE JSON RESPONSE
     try {
-      const carDetails = JSON.parse(cleanedText);
+      const rideDetails = JSON.parse(cleanedText);
 
       // RETURN SUCCESS RESPONSE WITH DATA
       return {
         success: true,
-        data: carDetails,
+        data: rideDetails,
       };
     } catch (parseError) {
       console.error("Failed to parse AI response:", parseError);

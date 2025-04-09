@@ -1,7 +1,7 @@
 import * as z from "zod";
 
 // FORM SCHEMA WITH ZOD
-export const carFormSchema = z.object({
+export const rideFormSchema = z.object({
   make: z.string().min(1, "Make is required"),
   model: z.string().min(1, "Model is required"),
   year: z.string().refine((val) => {
@@ -13,7 +13,7 @@ export const carFormSchema = z.object({
   color: z.string().min(1, "Color is required"),
   fuelType: z.string().min(1, "Fuel type is required"),
   transmission: z.string().min(1, "Transmission is required"),
-  bodyType: z.string().min(1, "Body type is required"),
+  bikeType: z.string().min(1, "Bike type is required"),
   seats: z.string().optional(),
   description: z.string().min(10, "Description must be at least 10 characters"),
   status: z.enum(["AVAILABLE", "UNAVAILABLE", "SOLD"]),

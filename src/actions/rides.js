@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
-import { serialzeCarData } from "@/lib/helpers";
+import { serialzeRideData } from "@/lib/helpers";
 
 async function fileToBase24(file) {
   const bytes = await file.arrayBuffer();
@@ -15,7 +15,7 @@ async function fileToBase24(file) {
   return buffer.toString("base64");
 }
 
-export async function processCarImageWithAI(file) {
+export async function processRideImageWithAI(file) {
   try {
     // CHECK IF API KEY IS AVAILABLE
     if (!process.env.GEMINI_API_KEY) {
@@ -39,16 +39,16 @@ export async function processCarImageWithAI(file) {
 
     // DEFINE THE PROMPT FOR CAR DETAIL EXTRACTION
     const prompt = `
-      Analyze this car image and extract the following information:
+      Analyze this two-wheeler image (bike, scooter, or EV) and extract the following information:
       1. Make (manufacturer)
       2. Model
       3. Year (approximately)
       4. Color
-      5. Body type (SUV, Sedan, Hatchback, etc.)
+      5. Type (Commuter, Cruiser, Sports, Scooter, Adventure, Tourer, Electric Scooter, Off-Road, etc.)
       6. Mileage
-      7. Fuel type (your best guess)
-      8. Transmission type (your best guess)
-      9. Price (your best guess)
+      7. Fuel type (Petrol, Electric, Hybrid — your best guess)
+      8. Transmission type (Manual, Automatic — your best guess)
+      9. Price (your best guess in Indian Rupees)
       9. Short Description as to be added to a car listing
 
       Format your response as a clean JSON object with these fields:
@@ -59,7 +59,7 @@ export async function processCarImageWithAI(file) {
         "color": "",
         "price": "",
         "mileage": "",
-        "bodyType": "",
+        "bikeType": "",
         "fuelType": "",
         "transmission": "",
         "description": "",
@@ -86,7 +86,7 @@ export async function processCarImageWithAI(file) {
         "model",
         "year",
         "color",
-        "bodyType",
+        "bikeType",
         "price",
         "mileage",
         "fuelType",
@@ -123,7 +123,7 @@ export async function processCarImageWithAI(file) {
   }
 }
 
-export async function addCar({ carData, images }) {
+export async function addRide({ rideData, images }) {
   try {
     const { userId } = await auth();
 
@@ -135,9 +135,9 @@ export async function addCar({ carData, images }) {
 
     if (!user) throw new Error("User not found");
 
-    // CREATE A UNIQUE FOLDER NAME FOR THE CAR'S IMAGES
-    const carId = uuidv4();
-    const folderPath = `cars/${carId}`;
+    // CREATE A UNIQUE FOLDER NAME FOR THE RIDE'S IMAGES
+    const rideId = uuidv4();
+    const folderPath = `rides/${rideId}`;
 
     // INIT SUPABASE CLIENT FOR SERVER SIDE OPERATIONS
     const cookieStore = await cookies();
@@ -170,8 +170,8 @@ export async function addCar({ carData, images }) {
       const filePath = `${folderPath}/${fileName}`;
 
       // UPLOAD THE FILE BUFFER DIRECTLY
-      const { data, error } = supabase.storage
-        .from("nextride-car-images")
+      const { data, error } = await supabase.storage
+        .from("nextride-images")
         .upload(filePath, imageBuffer, {
           contentType: `image/${fileExtension}`,
         });
@@ -182,7 +182,7 @@ export async function addCar({ carData, images }) {
       }
 
       // GET THE PUBLIC URL FOR UPLOADED FILE
-      const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/nextride-car-images/${filePath}`; // disable cache in config
+      const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/nextride-images/${filePath}`; // disable cache in config
 
       imageUrls.push(publicUrl);
     }
@@ -192,38 +192,38 @@ export async function addCar({ carData, images }) {
     }
 
     // ADD THE CAR TO THE DATABASE
-    const car = await db.car.create({
+    await db.ride.create({
       data: {
-        id: carId, // Use the same ID we used for the folder
-        make: carData.make,
-        model: carData.model,
-        year: carData.year,
-        price: carData.price,
-        mileage: carData.mileage,
-        color: carData.color,
-        fuelType: carData.fuelType,
-        transmission: carData.transmission,
-        bodyType: carData.bodyType,
-        seats: carData.seats,
-        description: carData.description,
-        status: carData.status,
-        featured: carData.featured,
+        id: rideId,
+        make: rideData.make,
+        model: rideData.model,
+        year: rideData.year,
+        price: rideData.price,
+        mileage: rideData.mileage,
+        color: rideData.color,
+        fuelType: rideData.fuelType,
+        transmission: rideData.transmission,
+        bikeType: rideData.bikeType,
+        seats: rideData.seats,
+        description: rideData.description,
+        status: rideData.status,
+        featured: rideData.featured,
         images: imageUrls, // Store the array of image URLs
       },
     });
 
-    revalidatePath("/admin/cars");
+    revalidatePath("/admin/rides");
 
     return {
       success: true,
     };
   } catch (error) {
     console.log(error);
-    throw new Error("Error adding car: ", error);
+    throw new Error("Error adding rides: ", error);
   }
 }
 
-export async function getCars(search = "") {
+export async function getRides(search = "") {
   try {
     const { userId } = await auth();
 
@@ -245,19 +245,19 @@ export async function getCars(search = "") {
       ];
     }
 
-    const cars = await db.car.findMany({
+    const rides = await db.ride.findMany({
       where,
       orderBy: { createdAt: "desc" },
     });
 
-    const serializedCars = cars.map(serialzeCarData);
+    const serializedRides = rides.map(serialzeRideData);
 
     return {
       success: true,
-      data: serializedCars,
+      data: serializedRides,
     };
   } catch (error) {
-    console.error("Error fetching cars:", error);
+    console.error("Error fetching rides:", error);
     return {
       success: false,
       error: error.message,
@@ -265,26 +265,26 @@ export async function getCars(search = "") {
   }
 }
 
-export async function deleteCar(id) {
+export async function deleteRide(id) {
   try {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
-    // FETCH THE CARS AND GET IMAGES
-    const car = await db.car.findUnique({
+    // FETCH THE RIDES AND GET IMAGES
+    const ride = await db.ride.findUnique({
       where: { id },
       select: { images: true },
     });
 
-    if (!car) {
+    if (!ride) {
       return {
         success: false,
-        error: "Car not found",
+        error: "Ride not found",
       };
     }
 
-    // DELETE THE CAR FROM DB
-    await db.car.delete({
+    // DELETE THE RIDE FROM DB
+    await db.ride.delete({
       where: { id },
     });
 
@@ -294,10 +294,10 @@ export async function deleteCar(id) {
       const supabase = createClient(cookieStore); // Create Supabase client with authz
 
       // EXTRACT FILE PATH FROM IMAGE URL
-      const filePaths = car.images
+      const filePaths = ride.images
         .map((imageUrl) =>
           imageUrl.replace(
-            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/nextride-car-images/`,
+            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/nextride-images/`,
             ""
           )
         )
@@ -308,7 +308,7 @@ export async function deleteCar(id) {
       // DELETE FILES FROM STORAGE IF PATHS WERE EXTRACTED
       if (filePaths.length > 0) {
         const { data, error } = await supabase.storage
-          .from("nextride-car-images")
+          .from("nextride-images")
           .remove(filePaths);
 
         if (error) {
@@ -322,13 +322,13 @@ export async function deleteCar(id) {
     }
 
     // REVALIDATE THE CARS LIST PAGE
-    revalidatePath("/admin/cars");
+    revalidatePath("/admin/rides");
 
     return {
       success: true,
     };
   } catch (error) {
-    console.error("Error deleting car:", error);
+    console.error("Error deleting ride:", error);
     return {
       success: false,
       error: error.message,
@@ -336,7 +336,7 @@ export async function deleteCar(id) {
   }
 }
 
-export async function updateCarStatus(id, { status, featured }) {
+export async function updateRideStatus(id, { status, featured }) {
   try {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
@@ -352,19 +352,19 @@ export async function updateCarStatus(id, { status, featured }) {
     }
 
     // UPDATE THE CAR
-    await db.car.update({
+    await db.ride.update({
       where: { id },
       data: updateData,
     });
 
-    // REVALIDATE THE CARS LIST PAGE
-    revalidatePath("/admin/cars");
+    // REVALIDATE THE RIDES LIST PAGE
+    revalidatePath("/admin/rides");
 
     return {
       success: true,
     };
   } catch (error) {
-    console.error("Error updating car status:", error);
+    console.error("Error updating ride status:", error);
     return {
       success: false,
       error: error.message,

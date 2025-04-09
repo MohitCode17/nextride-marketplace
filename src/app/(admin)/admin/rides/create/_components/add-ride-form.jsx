@@ -5,11 +5,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { carFormSchema } from "@/lib/zodCarSchema";
+import { rideFormSchema } from "@/lib/zodRideSchema";
 import ManualEntryForm from "./manual-entry-form";
 import AiUploadForm from "./ai-upload-form";
 
-const AddCarForm = () => {
+const AddRideForm = () => {
   const [activeTab, setActiveTab] = useState("ai");
   const [uploadedImages, setUploadedImages] = useState([]);
 
@@ -21,7 +21,7 @@ const AddCarForm = () => {
     handleSubmit,
     watch,
   } = useForm({
-    resolver: zodResolver(carFormSchema),
+    resolver: zodResolver(rideFormSchema),
     defaultValues: {
       make: "",
       model: "",
@@ -31,7 +31,7 @@ const AddCarForm = () => {
       color: "",
       fuelType: "",
       transmission: "",
-      bodyType: "",
+      bikeType: "",
       seats: "",
       description: "",
       status: "AVAILABLE",
@@ -47,7 +47,7 @@ const AddCarForm = () => {
         onValueChange={setActiveTab}
         className="mt-6"
       >
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-2 bg-teal-100">
           <TabsTrigger value="manual">Manual Entry</TabsTrigger>
           <TabsTrigger value="ai">AI Upload</TabsTrigger>
         </TabsList>
@@ -80,4 +80,4 @@ const AddCarForm = () => {
   );
 };
 
-export default AddCarForm;
+export default AddRideForm;

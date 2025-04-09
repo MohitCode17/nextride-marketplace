@@ -2,7 +2,7 @@
 CREATE TYPE "UserRole" AS ENUM ('USER', 'ADMIN');
 
 -- CreateEnum
-CREATE TYPE "CarStatus" AS ENUM ('AVAILABLE', 'UNAVAILABLE', 'SOLD');
+CREATE TYPE "RideStatus" AS ENUM ('AVAILABLE', 'UNAVAILABLE', 'SOLD');
 
 -- CreateEnum
 CREATE TYPE "DayOfWeek" AS ENUM ('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY');
@@ -26,7 +26,7 @@ CREATE TABLE "User" (
 );
 
 -- CreateTable
-CREATE TABLE "Car" (
+CREATE TABLE "Ride" (
     "id" TEXT NOT NULL,
     "make" TEXT NOT NULL,
     "model" TEXT NOT NULL,
@@ -36,23 +36,23 @@ CREATE TABLE "Car" (
     "color" TEXT NOT NULL,
     "fuelType" TEXT NOT NULL,
     "transmission" TEXT NOT NULL,
-    "bodyType" TEXT NOT NULL,
+    "bikeType" TEXT NOT NULL,
     "seats" INTEGER,
     "description" TEXT NOT NULL,
-    "status" "CarStatus" NOT NULL DEFAULT 'AVAILABLE',
+    "status" "RideStatus" NOT NULL DEFAULT 'AVAILABLE',
     "featured" BOOLEAN NOT NULL DEFAULT false,
     "images" TEXT[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "Car_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Ride_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "DealershipInfo" (
     "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL DEFAULT 'NextRide Motors',
-    "address" TEXT NOT NULL DEFAULT '69 Car Street, Autoville, CA 69420',
+    "name" TEXT NOT NULL DEFAULT 'NextRide Motors Pvt Limited',
+    "address" TEXT NOT NULL DEFAULT 'I-69 Karol Bagh, Central Delhi, DL 110002',
     "phone" TEXT NOT NULL DEFAULT '+1 (555) 123-4567',
     "email" TEXT NOT NULL DEFAULT 'contact@nextride.com',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -76,19 +76,19 @@ CREATE TABLE "WorkingHour" (
 );
 
 -- CreateTable
-CREATE TABLE "UserSavedCar" (
+CREATE TABLE "UserSavedRide" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "carId" TEXT NOT NULL,
+    "rideId" TEXT NOT NULL,
     "savedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "UserSavedCar_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "UserSavedRide_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "TestDriveBooking" (
     "id" TEXT NOT NULL,
-    "carId" TEXT NOT NULL,
+    "rideId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "bookingDate" DATE NOT NULL,
     "startTime" TEXT NOT NULL,
@@ -108,25 +108,25 @@ CREATE UNIQUE INDEX "User_clerkUserId_key" ON "User"("clerkUserId");
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
-CREATE INDEX "Car_make_model_idx" ON "Car"("make", "model");
+CREATE INDEX "Ride_make_model_idx" ON "Ride"("make", "model");
 
 -- CreateIndex
-CREATE INDEX "Car_bodyType_idx" ON "Car"("bodyType");
+CREATE INDEX "Ride_bikeType_idx" ON "Ride"("bikeType");
 
 -- CreateIndex
-CREATE INDEX "Car_price_idx" ON "Car"("price");
+CREATE INDEX "Ride_price_idx" ON "Ride"("price");
 
 -- CreateIndex
-CREATE INDEX "Car_year_idx" ON "Car"("year");
+CREATE INDEX "Ride_year_idx" ON "Ride"("year");
 
 -- CreateIndex
-CREATE INDEX "Car_status_idx" ON "Car"("status");
+CREATE INDEX "Ride_status_idx" ON "Ride"("status");
 
 -- CreateIndex
-CREATE INDEX "Car_fuelType_idx" ON "Car"("fuelType");
+CREATE INDEX "Ride_fuelType_idx" ON "Ride"("fuelType");
 
 -- CreateIndex
-CREATE INDEX "Car_featured_idx" ON "Car"("featured");
+CREATE INDEX "Ride_featured_idx" ON "Ride"("featured");
 
 -- CreateIndex
 CREATE INDEX "WorkingHour_dealershipId_idx" ON "WorkingHour"("dealershipId");
@@ -141,16 +141,16 @@ CREATE INDEX "WorkingHour_isOpen_idx" ON "WorkingHour"("isOpen");
 CREATE UNIQUE INDEX "WorkingHour_dealershipId_dayOfWeek_key" ON "WorkingHour"("dealershipId", "dayOfWeek");
 
 -- CreateIndex
-CREATE INDEX "UserSavedCar_userId_idx" ON "UserSavedCar"("userId");
+CREATE INDEX "UserSavedRide_userId_idx" ON "UserSavedRide"("userId");
 
 -- CreateIndex
-CREATE INDEX "UserSavedCar_carId_idx" ON "UserSavedCar"("carId");
+CREATE INDEX "UserSavedRide_rideId_idx" ON "UserSavedRide"("rideId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "UserSavedCar_userId_carId_key" ON "UserSavedCar"("userId", "carId");
+CREATE UNIQUE INDEX "UserSavedRide_userId_rideId_key" ON "UserSavedRide"("userId", "rideId");
 
 -- CreateIndex
-CREATE INDEX "TestDriveBooking_carId_idx" ON "TestDriveBooking"("carId");
+CREATE INDEX "TestDriveBooking_rideId_idx" ON "TestDriveBooking"("rideId");
 
 -- CreateIndex
 CREATE INDEX "TestDriveBooking_userId_idx" ON "TestDriveBooking"("userId");
@@ -165,13 +165,13 @@ CREATE INDEX "TestDriveBooking_status_idx" ON "TestDriveBooking"("status");
 ALTER TABLE "WorkingHour" ADD CONSTRAINT "WorkingHour_dealershipId_fkey" FOREIGN KEY ("dealershipId") REFERENCES "DealershipInfo"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "UserSavedCar" ADD CONSTRAINT "UserSavedCar_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "UserSavedRide" ADD CONSTRAINT "UserSavedRide_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "UserSavedCar" ADD CONSTRAINT "UserSavedCar_carId_fkey" FOREIGN KEY ("carId") REFERENCES "Car"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "UserSavedRide" ADD CONSTRAINT "UserSavedRide_rideId_fkey" FOREIGN KEY ("rideId") REFERENCES "Ride"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TestDriveBooking" ADD CONSTRAINT "TestDriveBooking_carId_fkey" FOREIGN KEY ("carId") REFERENCES "Car"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TestDriveBooking" ADD CONSTRAINT "TestDriveBooking_rideId_fkey" FOREIGN KEY ("rideId") REFERENCES "Ride"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "TestDriveBooking" ADD CONSTRAINT "TestDriveBooking_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

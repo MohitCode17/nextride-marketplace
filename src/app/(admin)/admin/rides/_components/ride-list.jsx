@@ -1,6 +1,12 @@
 "use client";
 
-import { deleteCar, getCars, updateCarStatus } from "@/actions/cars";
+import {
+  deleteCar,
+  deleteRide,
+  getRides,
+  updateCarStatus,
+  updateRideStatus,
+} from "@/actions/rides";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -32,6 +38,8 @@ import {
 import useFetch from "@/hooks/use-fetch";
 import { formatCurrency } from "@/lib/helpers";
 import {
+  Bike,
+  BikeIcon,
   CarIcon,
   Eye,
   Loader2,
@@ -47,11 +55,11 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-const CarsList = () => {
+const RideList = () => {
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [carToDelete, setCarToDelete] = useState(null);
+  const [rideToDelete, setRideToDelete] = useState(null);
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -80,117 +88,118 @@ const CarsList = () => {
 
   // GETTING ALL CARS FROM DB
   const {
-    loading: loadingCars,
-    fn: fetchCars,
-    data: carsData,
-    error: carsError,
-  } = useFetch(getCars);
+    loading: loadingRides,
+    fn: fetchRides,
+    data: ridesData,
+    error: ridesError,
+  } = useFetch(getRides);
 
   // UPDATE CAR
   const {
-    loading: updatingCar,
-    fn: updateCarStatusFn,
+    loading: updatingRide,
+    fn: updateRideStatusFn,
     data: updateResult,
     error: updateError,
-  } = useFetch(updateCarStatus);
+  } = useFetch(updateRideStatus);
 
   // DELETE CAR
   const {
-    loading: deletingCar,
-    fn: deleteCarFn,
+    loading: deletingRide,
+    fn: deleteRideFn,
     data: deleteResult,
     error: deleteError,
-  } = useFetch(deleteCar);
+  } = useFetch(deleteRide);
 
   // INITIAL FETCH FOR GETTING CARS WHEN COMPONENT MOUNT
   useEffect(() => {
-    fetchCars(search);
+    fetchRides(search);
   }, [search]);
 
   // TOGGLE FEATURED STATUS
-  const handleToggleFeatured = async (car) => {
-    console.log("Car Featured", car.featured);
-    await updateCarStatusFn(car.id, { featured: !car.featured });
+  const handleToggleFeatured = async (ride) => {
+    await updateRideStatusFn(ride.id, { featured: !ride.featured });
   };
 
   // Handle STATUS CHANGE
-  const handleStatusUpdate = async (car, newStatus) => {
-    await updateCarStatusFn(car.id, { status: newStatus });
+  const handleStatusUpdate = async (ride, newStatus) => {
+    await updateRideStatusFn(ride.id, { status: newStatus });
   };
 
   // Handle delete car
-  const handleDeleteCar = async () => {
-    if (!carToDelete) return;
+  const handleDeleteRide = async () => {
+    if (!rideToDelete) return;
 
-    await deleteCarFn(carToDelete.id);
+    await deleteRideFn(rideToDelete.id);
     setDeleteDialogOpen(false);
-    setCarToDelete(null);
+    setRideToDelete(null);
   };
 
   // HANDLE SUCCESSFULL
   useEffect(() => {
     if (deleteResult?.success) {
-      toast.success("Car deleted successfully");
-      fetchCars(search);
+      toast.success("Ride deleted successfully");
+      fetchRides(search);
     }
 
     if (updateResult?.success) {
-      toast.success("Car updated successfully");
-      fetchCars(search);
+      toast.success("Ride updated successfully");
+      fetchRides(search);
     }
   }, [updateResult, deleteResult, search]);
 
   // HANDLE ERRORS
   useEffect(() => {
-    if (carsError) {
-      toast.error("Failed to load cars");
+    if (ridesError) {
+      toast.error("Failed to load rides");
     }
 
     if (deleteError) {
-      toast.error("Failed to delete car");
+      toast.error("Failed to delete ride");
     }
 
     if (updateError) {
-      toast.error("Failed to update car");
+      toast.error("Failed to update ride");
     }
-  }, [carsError, deleteError, updateError]);
+  }, [ridesError, deleteError, updateError]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
 
-    fetchCars(search);
+    fetchRides(search);
   };
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col md:flex-row gap-4 items-start sm:items-center justify-between">
+      {/* HEADER + SEARCH */}
+      <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto justify-end">
         <Button
-          onClick={() => router.push("/admin/cars/create")}
-          className={"flex items-center"}
+          onClick={() => router.push("/admin/rides/create")}
+          className="flex items-center gap-1"
         >
-          <Plus className="h-4 w-4" /> Add Car
+          <Plus className="h-4 w-4" />
+          Add Rides
         </Button>
-
-        <form onSubmit={handleSearchSubmit} className="flex w-full sm:w-auto">
-          <div className="relative flex-1">
+        <form onSubmit={handleSearchSubmit} className="w-full sm:w-auto">
+          <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
             <Input
-              className={"pl-9 w-full sm:w-60"}
+              className="pl-9 w-full sm:w-60 bg-accent-foreground"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search cars..."
+              placeholder="Search rides..."
             />
           </div>
         </form>
       </div>
-      {/* CAR TABLE */}
+
+      {/* CARS TABLE */}
       <Card>
         <CardContent className="p-0">
-          {loadingCars && !carsData ? (
+          {loadingRides && !ridesData ? (
             <div className="flex justify-center items-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
             </div>
-          ) : carsData?.success && carsData.data.length > 0 ? (
+          ) : ridesData?.success && ridesData.data.length > 0 ? (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -205,14 +214,14 @@ const CarsList = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {carsData.data.map((car) => (
-                    <TableRow key={car.id}>
+                  {ridesData.data.map((ride) => (
+                    <TableRow key={ride.id} className="hover:bg-gray-50">
                       <TableCell>
                         <div className="w-16 h-12 rounded-md overflow-hidden">
-                          {car.images && car.images.length > 0 ? (
+                          {ride.images && ride.images.length > 0 ? (
                             <Image
-                              src={car.images[0]}
-                              alt={`${car.make} ${car.model}`}
+                              src={ride.images[0]}
+                              alt={`${ride.make} ${ride.model}`}
                               height={40}
                               width={40}
                               className="w-full h-full object-contain"
@@ -220,26 +229,26 @@ const CarsList = () => {
                             />
                           ) : (
                             <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                              <CarIcon className="h-6 w-6 text-gray-400" />
+                              <Bike className="h-6 w-6 text-gray-400" />
                             </div>
                           )}
                         </div>
                       </TableCell>
-                      <TableCell className="font-medium">
-                        {car.make} {car.model}
+                      <TableCell className="font-medium truncate max-w-[180px]">
+                        {ride.make} {ride.model}
                       </TableCell>
-                      <TableCell>{car.year}</TableCell>
-                      <TableCell>{formatCurrency(car.price)}</TableCell>
-                      <TableCell>{getStatusBadge(car.status)}</TableCell>
+                      <TableCell>{ride.year}</TableCell>
+                      <TableCell>{formatCurrency(ride.price)}</TableCell>
+                      <TableCell>{getStatusBadge(ride.status)}</TableCell>
                       <TableCell>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="p-0 h-9 w-9"
-                          onClick={() => handleToggleFeatured(car)}
-                          disabled={updatingCar}
+                          className="p-0 h-9 w-9 hover:bg-accent-foreground"
+                          onClick={() => handleToggleFeatured(ride)}
+                          disabled={updatingRide}
                         >
-                          {car.featured ? (
+                          {ride.featured ? (
                             <Star className="h-5 w-5 text-amber-500 fill-amber-500" />
                           ) : (
                             <StarOff className="h-5 w-5 text-gray-400" />
@@ -252,7 +261,7 @@ const CarsList = () => {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="p-0 h-8 w-8"
+                              className="p-0 h-8 w-8 hover:bg-lime-500"
                             >
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
@@ -260,7 +269,8 @@ const CarsList = () => {
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuItem
-                              onClick={() => router.push(`/cars/${car.id}`)}
+                              className={"hover:bg-lime-400 focus:bg-lime-400"}
+                              onClick={() => router.push(`/rides/${ride.id}`)}
                             >
                               <Eye className="mr-2 h-4 w-4" />
                               View
@@ -268,36 +278,39 @@ const CarsList = () => {
                             <DropdownMenuSeparator />
                             <DropdownMenuLabel>Status</DropdownMenuLabel>
                             <DropdownMenuItem
+                              className={"hover:bg-lime-400 focus:bg-lime-400"}
                               onClick={() =>
-                                handleStatusUpdate(car, "AVAILABLE")
+                                handleStatusUpdate(ride, "AVAILABLE")
                               }
                               disabled={
-                                car.status === "AVAILABLE" || updatingCar
+                                ride.status === "AVAILABLE" || updatingRide
                               }
                             >
                               Set Available
                             </DropdownMenuItem>
                             <DropdownMenuItem
+                              className={"hover:bg-lime-400 focus:bg-lime-400"}
                               onClick={() =>
-                                handleStatusUpdate(car, "UNAVAILABLE")
+                                handleStatusUpdate(ride, "UNAVAILABLE")
                               }
                               disabled={
-                                car.status === "UNAVAILABLE" || updatingCar
+                                ride.status === "UNAVAILABLE" || updatingRide
                               }
                             >
                               Set Unavailable
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={() => handleStatusUpdate(car, "SOLD")}
-                              disabled={car.status === "SOLD" || updatingCar}
+                              className={"hover:bg-lime-400 focus:bg-lime-400"}
+                              onClick={() => handleStatusUpdate(ride, "SOLD")}
+                              disabled={ride.status === "SOLD" || updatingRide}
                             >
                               Mark as Sold
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
-                              className="text-red-600"
+                              className="text-red-600 hover:bg-lime-400 focus:bg-lime-400"
                               onClick={() => {
-                                setCarToDelete(car);
+                                setRideToDelete(ride);
                                 setDeleteDialogOpen(true);
                               }}
                             >
@@ -314,17 +327,17 @@ const CarsList = () => {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-              <CarIcon className="h-12 w-12 text-gray-300 mb-4" />
+              <BikeIcon className="h-14 w-14 text-gray-300 mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-1">
-                No cars found
+                No rides found
               </h3>
               <p className="text-gray-500 mb-4">
                 {search
-                  ? "No cars match your search criteria"
-                  : "Your inventory is empty. Add cars to get started."}
+                  ? "No rides match your search criteria"
+                  : "Your inventory is empty. Add rides to get started."}
               </p>
-              <Button onClick={() => router.push("/admin/cars/create")}>
-                Add Your First Car
+              <Button onClick={() => router.push("/admin/rides/create")}>
+                Add Your First Ride
               </Button>
             </div>
           )}
@@ -335,33 +348,37 @@ const CarsList = () => {
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogTitle className="text-destructive">
+              Confirm Deletion
+            </DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete {carToDelete?.make}{" "}
-              {carToDelete?.model} ({carToDelete?.year})? This action cannot be
-              undone.
+              Are you sure you want to delete{" "}
+              <span className="font-semibold">
+                {rideToDelete?.make} {rideToDelete?.model}
+              </span>{" "}
+              ({rideToDelete?.year})? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button
               variant="outline"
               onClick={() => setDeleteDialogOpen(false)}
-              disabled={deletingCar}
+              disabled={deletingRide}
             >
               Cancel
             </Button>
             <Button
               variant="destructive"
-              onClick={handleDeleteCar}
-              disabled={deletingCar}
+              onClick={handleDeleteRide}
+              disabled={deletingRide}
             >
-              {deletingCar ? (
+              {deletingRide ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Deleting...
                 </>
               ) : (
-                "Delete Car"
+                "Delete Ride"
               )}
             </Button>
           </DialogFooter>
@@ -371,4 +388,4 @@ const CarsList = () => {
   );
 };
 
-export default CarsList;
+export default RideList;

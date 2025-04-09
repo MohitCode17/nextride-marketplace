@@ -24,7 +24,7 @@ model User {
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
   role        UserRole           @default(USER)
-  savedCars   UserSavedCar[]
+  savedRides  UserSavedRide[]
   testDrives  TestDriveBooking[]
 }
 
@@ -33,7 +33,7 @@ enum UserRole {
   ADMIN
 }
 
-model Car {
+model Ride {
   id                String             @id @default(uuid())
   make              String
   model             String
@@ -43,19 +43,19 @@ model Car {
   color             String
   fuelType          String
   transmission      String
-  bodyType          String
+  bikeType          String
   seats             Int?
   description       String
-  status            CarStatus          @default(AVAILABLE)
+  status            RideStatus         @default(AVAILABLE)
   featured          Boolean            @default(false)
   images            String[] // Array of Supabase storage URLs
-  savedBy           UserSavedCar[]
+  savedBy           UserSavedRide[]
   testDriveBookings TestDriveBooking[]
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
 
   @@index([make, model])
-  @@index([bodyType])
+  @@index([bikeType])
   @@index([price])
   @@index([year])
   @@index([status])
@@ -63,7 +63,7 @@ model Car {
   @@index([featured])
 }
 
-enum CarStatus {
+enum RideStatus {
   AVAILABLE
   UNAVAILABLE
   SOLD
@@ -71,8 +71,8 @@ enum CarStatus {
 
 model DealershipInfo {
   id           String        @id @default(uuid())
-  name         String        @default("NextRide Motors")
-  address      String        @default("69 Car Street, Autoville, CA 69420")
+  name         String        @default("NextRide Motors Pvt Limited")
+  address      String        @default("I-69 Karol Bagh, Central Delhi, DL 110002")
   phone        String        @default("+1 (555) 123-4567")
   email        String        @default("contact@nextride.com")
   workingHours WorkingHour[]
@@ -107,23 +107,23 @@ enum DayOfWeek {
   SUNDAY
 }
 
-model UserSavedCar {
+model UserSavedRide {
   id      String   @id @default(uuid())
   userId  String
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  carId   String
-  car     Car      @relation(fields: [carId], references: [id], onDelete: Cascade)
+  rideId  String
+  ride    Ride     @relation(fields: [rideId], references: [id], onDelete: Cascade)
   savedAt DateTime @default(now())
 
-  @@unique([userId, carId])
+  @@unique([userId, rideId])
   @@index([userId])
-  @@index([carId])
+  @@index([rideId])
 }
 
 model TestDriveBooking {
   id          String        @id @default(uuid())
-  carId       String
-  car         Car           @relation(fields: [carId], references: [id])
+  rideId      String
+  ride        Ride          @relation(fields: [rideId], references: [id])
   userId      String
   user        User          @relation(fields: [userId], references: [id])
   bookingDate DateTime      @db.Date
@@ -134,7 +134,7 @@ model TestDriveBooking {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
-  @@index([carId])
+  @@index([rideId])
   @@index([userId])
   @@index([bookingDate])
   @@index([status])

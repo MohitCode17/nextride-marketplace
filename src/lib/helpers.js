@@ -1,9 +1,9 @@
-export const serialzeCarData = (car, wishlisted = false) => {
+export const serialzeRideData = (ride, wishlisted = false) => {
   return {
-    ...car,
-    price: car.price ? parseFloat(car.price.toString()) : 0,
-    createdAt: car.createdAt?.toISOString(),
-    updatedAt: car.updatedAt?.toISOString(),
+    ...ride,
+    price: ride.price ? parseFloat(ride.price.toString()) : 0,
+    createdAt: ride.createdAt?.toISOString(),
+    updatedAt: ride.updatedAt?.toISOString(),
     wishlisted: wishlisted,
   };
 };

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useDropzone } from "react-dropzone";
-import { processCarImageWithAI } from "@/actions/cars";
+import { processRideImageWithAI } from "@/actions/rides";
 import { Camera, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import useFetch from "@/hooks/use-fetch";
@@ -53,7 +53,7 @@ const AiUploadForm = ({ setUploadedImages, setActiveTab, setValue }) => {
     fn: processImageFn,
     data: processImageResult,
     error: processImageError,
-  } = useFetch(processCarImageWithAI);
+  } = useFetch(processRideImageWithAI);
 
   // PROCESS WITH AI
   const processWithAI = async () => {
@@ -74,20 +74,20 @@ const AiUploadForm = ({ setUploadedImages, setActiveTab, setValue }) => {
 
   // HANDLE SUCCESS WITH AI
   useEffect(() => {
-    const carDetails = processImageResult?.data;
+    const rideDetails = processImageResult?.data;
 
     if (processImageResult?.success) {
       // UPDATE FORM WITH AI RESULT
-      setValue("make", carDetails.make);
-      setValue("model", carDetails.model);
-      setValue("year", carDetails.year.toString());
-      setValue("color", carDetails.color);
-      setValue("bodyType", carDetails.bodyType);
-      setValue("fuelType", carDetails.fuelType);
-      setValue("price", carDetails.price);
-      setValue("mileage", carDetails.mileage);
-      setValue("transmission", carDetails.transmission);
-      setValue("description", carDetails.description);
+      setValue("make", rideDetails.make);
+      setValue("model", rideDetails.model);
+      setValue("year", rideDetails.year.toString());
+      setValue("color", rideDetails.color);
+      setValue("bikeType", rideDetails.bikeType);
+      setValue("fuelType", rideDetails.fuelType);
+      setValue("price", rideDetails.price);
+      setValue("mileage", rideDetails.mileage);
+      setValue("transmission", rideDetails.transmission);
+      setValue("description", rideDetails.description);
 
       // ADD THE IMAGE TO THE UPLOADED IMAGES
       const reader = new FileReader();
@@ -98,9 +98,9 @@ const AiUploadForm = ({ setUploadedImages, setActiveTab, setValue }) => {
       reader.readAsDataURL(uploadedAiImage);
 
       toast.success("Successfully extracted car details", {
-        description: `Detected ${carDetails.year} ${carDetails.make} ${
-          carDetails.model
-        } with ${Math.round(carDetails.confidence * 100)}% confidence`,
+        description: `Detected ${rideDetails.year} ${rideDetails.make} ${
+          rideDetails.model
+        } with ${Math.round(rideDetails.confidence * 100)}% confidence`,
       });
 
       // Switch to manual tab for the user to review and fill in missing details
@@ -111,9 +111,10 @@ const AiUploadForm = ({ setUploadedImages, setActiveTab, setValue }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>AI-Powered Car Details Extraction</CardTitle>
+        <CardTitle>AI-Powered Details Extraction</CardTitle>
         <CardDescription>
-          Upload an image of a car and let Gemini AI extract its details.
+          Upload an image of a bike, scooter or EV and let Gemini AI extract its
+          details.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -129,6 +130,7 @@ const AiUploadForm = ({ setUploadedImages, setActiveTab, setValue }) => {
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
+                    className={"hover:bg-teal-500"}
                     size="sm"
                     onClick={() => {
                       setImagePreview(null);
@@ -165,7 +167,7 @@ const AiUploadForm = ({ setUploadedImages, setActiveTab, setValue }) => {
                 <div className="flex flex-col items-center justify-center">
                   <Camera className="h-12 w-12 text-gray-400 mb-3" />
                   <span className="text-sm text-gray-600">
-                    Drag & drop or click to upload a car image
+                    Drag & drop or click to upload a ride image
                   </span>
                   <span className="text-xs text-gray-500 mt-1">
                     (JPG, PNG, WebP, max 5MB)
@@ -176,11 +178,11 @@ const AiUploadForm = ({ setUploadedImages, setActiveTab, setValue }) => {
           </div>
 
           {processImageLoading && (
-            <div className="bg-blue-50 text-blue-700 p-4 rounded-md flex items-center">
+            <div className="bg-teal-50 text-teal-700 p-4 rounded-md flex items-center">
               <Loader2 className="animate-spin h-5 w-5 mr-2" />
               <div>
                 <p className="font-medium">Analyzing image...</p>
-                <p className="text-sm">Gemini AI is extracting car details</p>
+                <p className="text-sm">Gemini AI is extracting details</p>
               </div>
             </div>
           )}
@@ -188,11 +190,11 @@ const AiUploadForm = ({ setUploadedImages, setActiveTab, setValue }) => {
           <div className="bg-gray-50 p-4 rounded-md">
             <h3 className="font-medium mb-2">How it works</h3>
             <ol className="space-y-2 text-sm text-gray-600 list-decimal pl-4">
-              <li>Upload a clear image of the car</li>
+              <li>Upload a clear image of the bike or scooter</li>
               <li>Click "Extract Details" to analyze with Gemini AI</li>
               <li>Review the extracted information</li>
               <li>Fill in any missing details manually</li>
-              <li>Add the car to your inventory</li>
+              <li>Add the bike to your inventory</li>
             </ol>
           </div>
 
@@ -201,10 +203,12 @@ const AiUploadForm = ({ setUploadedImages, setActiveTab, setValue }) => {
               Tips for best results
             </h3>
             <ul className="space-y-1 text-sm text-amber-700">
-              <li>• Use clear, well-lit images</li>
-              <li>• Try to capture the entire vehicle</li>
-              <li>• For difficult models, use multiple views</li>
-              <li>• Always verify AI-extracted information</li>
+              <li>• Use clear, well-lit images of the bike or scooter</li>
+              <li>• Try to capture the entire vehicle from the side</li>
+              <li>• For better accuracy, upload multiple angles</li>
+              <li>
+                • Always verify AI-extracted information before submission
+              </li>
             </ul>
           </div>
         </div>

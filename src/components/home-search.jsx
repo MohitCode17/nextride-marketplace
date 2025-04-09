@@ -114,47 +114,54 @@ const HomeSearch = () => {
     <div>
       <form onSubmit={handleTextSearch}>
         <div className="relative flex items-center">
-          <Search className="absolute left-3 w-5 h-5 z-50" />
+          <Search className="absolute left-4 w-5 h-5 text-lime-400 z-50" />
           <input
             type="text"
-            placeholder="Enter model, company, or use our AI image search..."
+            placeholder="Search bikes, scooties, EVs or try our AI image search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full border-gray-300 rounded-full bg-white/95 backdrop-blur-sm py-6 pr-12 pl-10"
+            className="w-full rounded-full border border-lime-600/50 bg-[#0c1a1a]/70 backdrop-blur-md py-5 pr-14 pl-12 text-white placeholder:text-gray-400 shadow-md focus:outline-none focus:ring-2 focus:ring-lime-500 transition"
           />
 
-          {/* SEARCH BUTTON */}
+          {/* CAMERA BUTTON */}
           <div className="absolute right-[100px]">
             <Camera
               size={35}
               onClick={() => setIsImageSearchActive(!isImageSearchActive)}
-              className="cursor-pointer rounded-xl p-1.5"
+              className="cursor-pointer rounded-full p-2 transition"
               style={{
-                background: isImageSearchActive ? "black" : "",
-                color: isImageSearchActive ? "white" : "",
+                background: isImageSearchActive ? "#00bfa6" : "",
+                color: isImageSearchActive ? "white" : "#00bfa6",
               }}
             />
           </div>
 
-          <Button type="submit" className={"absolute right-2 rounded-full"}>
+          {/* SEARCH BUTTON */}
+          <Button
+            type="submit"
+            className="absolute right-2 rounded-full bg-teal-600 hover:bg-teal-700 text-white px-5 py-2"
+          >
             Search
           </Button>
         </div>
       </form>
 
       {isImageSearchActive && (
-        <div className="mt-4">
+        <div className="mt-6">
           <form onSubmit={handleImageSearch} className="space-y-4">
-            <div className="border-2 border-dashed border-gray-300 rounded-3xl p-6 text-center">
+            <div className="border-2 border-dashed border-lime-700/50 bg-[#0c1a1a]/70 backdrop-blur-md rounded-3xl p-6 text-center text-white shadow-md transition">
               {imagePreview ? (
                 <div className="flex flex-col items-center">
                   <img
                     src={imagePreview}
-                    alt="Car preview"
-                    className="h-40 object-contain mb-4"
+                    alt="Vehicle preview"
+                    className="h-40 object-contain mb-4 rounded-md"
                   />
                   <Button
                     variant="outline"
+                    className={
+                      "bg-red-500 border-red-500 hover:bg-red-600 transition"
+                    }
                     onClick={() => {
                       setSearchImage(null);
                       setImagePreview("");
@@ -168,26 +175,27 @@ const HomeSearch = () => {
                 <div {...getRootProps()} className="cursor-pointer">
                   <input {...getInputProps()} />
                   <div className="flex flex-col items-center">
-                    <Upload className="h-12 w-12 text-gray-400 mb-2" />
-                    <p className="text-gray-500 mb-2">
+                    <Upload className="h-12 w-12 text-teal-400 mb-2" />
+                    <p className="text-gray-300 mb-1">
                       {isDragActive && !isDragReject
                         ? "Leave the file here to upload"
-                        : "Drag & drop a car image or click to select"}
+                        : "Drag & drop a bike/scooty/EV image or click to select"}
                     </p>
                     {isDragReject && (
                       <p className="text-red-500 mb-2">Invalid image type</p>
                     )}
-                    <p className="text-gray-400 text-sm">
+                    <p className="text-gray-500 text-sm">
                       Supports: JPG, PNG (max 5MB)
                     </p>
                   </div>
                 </div>
               )}
             </div>
+
             {imagePreview && (
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full bg-teal-600 hover:bg-teal-700 text-white py-3"
                 disabled={isUploading || isProcessing}
               >
                 {isUploading

@@ -8,18 +8,18 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { formatCurrency } from "@/lib/helpers";
 
-const CarCard = ({ car }) => {
-  const [isSaved, setIsSaved] = useState(car.wishlisted);
+const RideCard = ({ ride }) => {
+  const [isSaved, setIsSaved] = useState(ride.wishlisted);
   const [isToggling, setIsToggling] = useState(false);
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition group">
       <div className="relative h-48">
-        {car.images && car.images.length > 0 ? (
+        {ride.images && ride.images.length > 0 ? (
           <div className="relative w-full h-full">
             <Image
-              src={car.images[0]}
-              alt={`${car.make} ${car.model}`}
+              src={ride.images[0]}
+              alt={`${ride.make} ${ride.model}`}
               fill
               className="object-cover group-hover:scale-105 transition duration-300"
             />
@@ -32,9 +32,9 @@ const CarCard = ({ car }) => {
 
         <Button
           variant={"ghost"}
-          className={`absolute top-2 right-2 bg-white/90 rounded-full p-1.5 ${
+          className={`absolute top-2 right-2 bg-white/90 rounded-full p-1.5 hover:bg-accent-foreground ${
             isSaved
-              ? "text-red-500 hover:text-red-600"
+              ? "text-lime-500 hover:text-lime-700"
               : "text-gray-600 hover:text-gray-900"
           }`}
         >
@@ -49,31 +49,31 @@ const CarCard = ({ car }) => {
       <CardContent className={"p-4"}>
         <div className="flex flex-col mb-2">
           <h3 className="text-lg font-bold line-clamp-1">
-            {car.make} {car.model}
+            {ride.make} {ride.model}
           </h3>
 
-          <span className="text-xl font-bold text-blue-600">
-            {formatCurrency(car.price)}
+          <span className="text-xl font-bold text-lime-600">
+            {formatCurrency(ride.price)}
           </span>
         </div>
 
-        <div className="text-gray-600 mb-2 flex items-center">
-          <span>{car.year}</span>
+        <div className="text-gray-600 text-sm mb-2 flex items-center">
+          <span>{ride.year}</span>
           <span className="mx-2">•</span>
-          <span>{car.transmission}</span>
+          <span>{ride.transmission}</span>
           <span className="mx-2">•</span>
-          <span>{car.fuelType}</span>
+          <span>{ride.fuelType}</span>
         </div>
 
         <div className="flex flex-wrap gap-1 mb-4">
-          <Badge variant={"outline"} className={"bg-gray-50"}>
-            {car.bodyType}
+          <Badge variant={"outline"} className={"bg-lime-50 text-lime-900"}>
+            {ride.bodyType}
           </Badge>
-          <Badge variant={"outline"} className={"bg-gray-50"}>
-            {car.mileage.toLocaleString()}
+          <Badge variant={"outline"} className={"bg-lime-50 text-lime-900"}>
+            {ride.mileage.toLocaleString()}
           </Badge>
-          <Badge variant={"outline"} className={"bg-gray-50"}>
-            {car.color}
+          <Badge variant={"outline"} className={"bg-lime-50 text-lime-900"}>
+            {ride.color}
           </Badge>
         </div>
 
@@ -85,4 +85,4 @@ const CarCard = ({ car }) => {
   );
 };
 
-export default CarCard;
+export default RideCard;

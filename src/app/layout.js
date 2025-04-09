@@ -7,9 +7,9 @@ import { Toaster } from "sonner";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "NextRide - AI Car Marketplace",
+  title: "NextRide - Smart Marketplace for Bikes, Scooters & EVs",
   description:
-    "Discover your next ride with AI-driven car recommendations and unbeatable deals.",
+    "Let AI help you find the perfect ride—whether it's a bike, scooter, or electric vehicle. Fast, smart, and easy.",
 };
 
 export default function RootLayout({ children }) {
@@ -20,9 +20,12 @@ export default function RootLayout({ children }) {
           <Header />
           <main className="min-h-screen">{children}</main>
           <Toaster />
-          <footer className="bg-blue-100 py-12">
-            <div className="container mx-auto text-center text-gray-700 px-4">
-              <p>Made with ❤️ by MohitCodes</p>
+          <footer className="bg-white border-t py-6">
+            <div className="container mx-auto text-center text-gray-600 px-4 text-sm">
+              <p>
+                Made with <span className="text-pink-500">❤️</span> by{" "}
+                <span className="text-teal-600 font-semibold">MohitCodes</span>
+              </p>
             </div>
           </footer>
         </body>

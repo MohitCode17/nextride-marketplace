@@ -2,7 +2,7 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { ArrowLeft, CarFront } from "lucide-react";
+import { ArrowLeft, Bike, CarFront, LayoutPanelLeft } from "lucide-react";
 import { checkUser } from "@/lib/checkUser";
 
 const Header = async ({ isAdminPage = false }) => {
@@ -16,10 +16,10 @@ const Header = async ({ isAdminPage = false }) => {
         {/* COMPANY LOGO */}
         <Link href={isAdminPage ? "/admin" : "/"} className="flex">
           <Image
-            src={"/logo-light.png"}
+            src={"/nextride-logo.png"}
             alt="NextRide Logo"
-            width={200}
-            height={60}
+            width={100}
+            height={30}
             className="w-auto object-contain"
           />
           {isAdminPage && (
@@ -30,13 +30,13 @@ const Header = async ({ isAdminPage = false }) => {
         {/* NAV BUTTONS */}
         <div className="flex items-center space-x-4">
           {isAdminPage ? (
-            <Link
-              href={"/"}
-              className="text-gray-600 hover:text-blue-600 flex items-center gap-2"
-            >
-              <Button variant={"outline"} className="flex items-center gap-2">
+            <Link href={"/"} className="text-gray-600 flex items-center gap-2">
+              <Button
+                variant={"outline"}
+                className="flex items-center gap-2 hover:bg-teal-600"
+              >
                 <ArrowLeft size={18} />
-                <span>Back to App</span>
+                <span className="md:flex hidden">Back to App</span>
               </Button>
             </Link>
           ) : (
@@ -44,20 +44,20 @@ const Header = async ({ isAdminPage = false }) => {
               {!isAdmin ? (
                 <Link
                   href={"/reservations"}
-                  className="text-gray-600 hover:text-blue-600 flex items-center gap-2"
+                  className="text-gray-600 hover:text-teal-600 flex items-center gap-2"
                 >
-                  <Button variant={"outline"}>
-                    <CarFront size={18} />
+                  <Button variant={"outline"} className={"hover:bg-teal-500"}>
+                    <Bike size={18} />
                     <span className="hidden md:inline">My Reservations</span>
                   </Button>
                 </Link>
               ) : (
                 <Link
                   href={"/admin"}
-                  className="text-gray-600 hover:text-blue-600 flex items-center gap-2"
+                  className="text-gray-600 flex items-center gap-2"
                 >
-                  <Button variant={"outline"}>
-                    <CarFront size={18} />
+                  <Button variant={"outline"} className={"hover:bg-teal-600"}>
+                    <LayoutPanelLeft size={18} />
                     <span className="hidden md:inline">Admin Panel</span>
                   </Button>
                 </Link>
@@ -65,11 +65,11 @@ const Header = async ({ isAdminPage = false }) => {
 
               <Link
                 href={"/saved-cars"}
-                className="text-gray-600 hover:text-blue-600 flex items-center gap-2"
+                className="text-gray-600 hover:text-teal-600 flex items-center gap-2"
               >
                 <Button>
                   <CarFront size={18} />
-                  <span className="hidden md:inline">Saved Cars</span>
+                  <span className="hidden md:inline">Saved Rides</span>
                 </Button>
               </Link>
             </SignedIn>
@@ -79,7 +79,9 @@ const Header = async ({ isAdminPage = false }) => {
           <SignedOut>
             {!isAdminPage && (
               <SignInButton forceRedirectUrl="/">
-                <Button variant={"outline"}>Login</Button>
+                <Button variant={"outline"} className={"hover:bg-teal-500"}>
+                  Login
+                </Button>
               </SignInButton>
             )}
           </SignedOut>
@@ -88,7 +90,9 @@ const Header = async ({ isAdminPage = false }) => {
             <UserButton
               appearance={{
                 elements: {
-                  avatarBox: "w-10 h-10",
+                  avatarBox:
+                    "w-10 h-10 rounded-full ring-2 ring-teal-500 transition duration-300 hover:ring-teal-700",
+                  userButtonPopoverCard: "shadow-lg border border-gray-200",
                 },
               }}
             />

@@ -183,7 +183,7 @@ const SettingsForm = () => {
   return (
     <div>
       <Tabs defaultValue="hours">
-        <TabsList>
+        <TabsList className={"bg-teal-100"}>
           <TabsTrigger value="hours">
             <Clock className="h-4 w-4 mr-2" />
             Working Hours
@@ -207,7 +207,7 @@ const SettingsForm = () => {
                 {DAYS.map((day, index) => (
                   <div
                     key={day.value}
-                    className="grid grid-cols-12 gap-4 items-center py-3 px-4 rounded-lg hover:bg-slate-50"
+                    className="grid grid-cols-12 gap-4 items-center py-3 px-4 rounded-lg hover:bg-teal-50"
                   >
                     <div className="col-span-3 md:col-span-2">
                       <div className="font-medium">{day.label}</div>
@@ -326,7 +326,7 @@ const SettingsForm = () => {
                 <div>
                   <Table>
                     <TableHeader>
-                      <TableRow>
+                      <TableRow className={"hover:bg-teal-50"}>
                         <TableHead>User</TableHead>
                         <TableHead>Email</TableHead>
                         <TableHead>Role</TableHead>
@@ -335,7 +335,7 @@ const SettingsForm = () => {
                     </TableHeader>
                     <TableBody>
                       {filteredUsers.map((user) => (
-                        <TableRow key={user.id}>
+                        <TableRow key={user.id} className={"hover:bg-teal-50"}>
                           <TableCell className="font-medium">
                             <div className="flex items-center gap-2">
                               <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
@@ -357,8 +357,8 @@ const SettingsForm = () => {
                             <Badge
                               className={
                                 user.role === "ADMIN"
-                                  ? "bg-green-800"
-                                  : "bg-gray-800"
+                                  ? "bg-green-600"
+                                  : "bg-gray-600"
                               }
                             >
                               {user.role}
@@ -369,7 +369,7 @@ const SettingsForm = () => {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="text-red-600"
+                                className="text-red-600 hover:bg-teal-500"
                                 onClick={() => {
                                   setUserToDemote(user);
                                   setConfirmRemoveDialog(true);
@@ -387,6 +387,7 @@ const SettingsForm = () => {
                                   setUserToPromote(user);
                                   setConfirmAdminDialog(true);
                                 }}
+                                className={"hover:bg-teal-500"}
                                 disabled={updatingRole}
                               >
                                 <Shield className="h-4 w-4 mr-2" />
@@ -432,6 +433,7 @@ const SettingsForm = () => {
               <DialogFooter>
                 <Button
                   variant="outline"
+                  className={"hover:bg-teal-700"}
                   onClick={() => setConfirmAdminDialog(false)}
                   disabled={updatingRole}
                 >
@@ -473,6 +475,7 @@ const SettingsForm = () => {
                   variant="outline"
                   onClick={() => setConfirmRemoveDialog(false)}
                   disabled={updatingRole}
+                  className={"hover:bg-teal-700"}
                 >
                   Cancel
                 </Button>

@@ -1,23 +1,23 @@
-export async function getCarFilters() {
+export async function getRideFilters() {
   try {
     // GET UNIQUE MAKES
-    const makes = await db.car.findMany({
+    const makes = await db.ride.findMany({
       where: { status: "AVAILABLE" },
       select: { make: true },
       distinct: ["make"],
       orderBy: { make: "asc" },
     });
 
-    // GET UNIQUE BODY TYPES
-    const bodyTypes = await db.car.findMany({
+    // GET UNIQUE BIKE TYPES
+    const bikeTypes = await db.ride.findMany({
       where: { status: "AVAILABLE" },
-      select: { bodyType: true },
-      distinct: ["bodyType"],
-      orderBy: { bodyType: "asc" },
+      select: { bikeType: true },
+      distinct: ["bikeType"],
+      orderBy: { bikeType: "asc" },
     });
 
     // GET UNIQUE FUEL TYPES
-    const fuelTypes = await db.car.findMany({
+    const fuelTypes = await db.ride.findMany({
       where: { status: "AVAILABLE" },
       select: { fuelType: true },
       distinct: ["fuelType"],
@@ -25,7 +25,7 @@ export async function getCarFilters() {
     });
 
     // GET UNIQUE TRANSMISSIONS
-    const transmissions = await db.car.findMany({
+    const transmissions = await db.ride.findMany({
       where: { status: "AVAILABLE" },
       select: { transmission: true },
       distinct: ["transmission"],
@@ -33,7 +33,7 @@ export async function getCarFilters() {
     });
 
     // GET MIN AND MAX PRICES USING PRISMA AGGREGATIONS
-    const priceAggregations = await db.car.aggregate({
+    const priceAggregations = await db.ride.aggregate({
       where: { status: "AVAILABLE" },
       _min: { price: true },
       _max: { price: true },
@@ -43,7 +43,7 @@ export async function getCarFilters() {
       success: true,
       data: {
         makes: makes.map((item) => item.make),
-        bodyTypes: bodyTypes.map((item) => item.bodyType),
+        bikeTypes: bikeTypes.map((item) => item.bikeType),
         fuelTypes: fuelTypes.map((item) => item.fuelType),
         transmissions: transmissions.map((item) => item.transmission),
         priceRange: {
@@ -57,6 +57,6 @@ export async function getCarFilters() {
       },
     };
   } catch (error) {
-    throw new Error("Error fetching car filters:" + error.message);
+    throw new Error("Error fetching ride filters:" + error.message);
   }
 }

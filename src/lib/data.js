@@ -1,110 +1,67 @@
-export const featuredCars = [
-  {
-    id: 1,
-    make: "Toyota",
-    model: "Camry",
-    year: 2024,
-    price: 30999,
-    images: ["/1.png"],
-    transmission: "Automatic",
-    fuelType: "Hybrid",
-    bodyType: "Sedan",
-    mileage: 9000,
-    color: "Silver",
-    wishlisted: true,
-  },
-  {
-    id: 2,
-    make: "Honda",
-    model: "Civic",
-    year: 2023,
-    price: 25999,
-    images: ["/2.webp"],
-    transmission: "Automatic",
-    fuelType: "Gasoline",
-    bodyType: "Sedan",
-    mileage: 10000,
-    color: "Black",
-    wishlisted: false,
-  },
-  {
-    id: 3,
-    make: "Tesla",
-    model: "Model 3",
-    year: 2022,
-    price: 49999,
-    images: ["/3.jpg"],
-    transmission: "Manual",
-    fuelType: "Gasoline",
-    bodyType: "Convertible",
-    mileage: 6000,
-    color: "Blue",
-    wishlisted: true,
-  },
-];
-
 export const carMakes = [
-  { id: 1, name: "Hyundai", image: "/make/hyundai.webp" },
-  { id: 2, name: "Honda", image: "/make/honda.webp" },
-  { id: 3, name: "BMW", image: "/make/bmw.webp" },
-  { id: 4, name: "Tata", image: "/make/tata.webp" },
-  { id: 5, name: "Mahindra", image: "/make/mahindra.webp" },
-  { id: 6, name: "Ford", image: "/make/ford.webp" },
+  { id: 1, name: "Royal Enfield", image: "/make/enfield.webp" },
+  { id: 2, name: "Hero", image: "/make/hero.webp" },
+  { id: 3, name: "Honda", image: "/make/honda.webp" },
+  { id: 4, name: "Yamaha", image: "/make/yamaha.webp" },
+  { id: 5, name: "TVS", image: "/make/tvs.webp" },
+  { id: 6, name: "Ather", image: "/make/ather.webp" },
 ];
 
 export const bodyTypes = [
-  { id: 1, name: "SUV", image: "/body/suv.webp" },
-  { id: 2, name: "Sedan", image: "/body/sedan.webp" },
-  { id: 3, name: "Hatchback", image: "/body/hatchback.webp" },
-  { id: 4, name: "Convertible", image: "/body/convertible.webp" },
+  { id: 1, name: "Cruiser", image: "/body/cruiser.webp" }, // Royal Enfield Classic, Meteor
+  { id: 2, name: "Sportbike", image: "/body/sports.webp" }, // TVS Apache RR, Yamaha R15
+  { id: 3, name: "Commuter", image: "/body/commuter.webp" }, // Hero Splendor, TVS Star City
+  { id: 4, name: "Scooter", image: "/body/scooter.webp" }, // Activa, Jupiter
+  { id: 5, name: "Adventure", image: "/body/adventure.webp" }, // Himalayan, KTM Adventure
+  // { id: 6, name: "Tourer", image: "/body/tourer.webp" }, // Bajaj Dominar, Interceptor 650
 ];
 
 export const faqItems = [
   {
-    question: "How does AI-powered car search work?",
+    question: "Can I test ride a bike or scooter before buying?",
     answer:
-      "Our advanced AI analyzes your preferences and shows you the best-matched cars instantly. Just tell us what you're looking for!",
+      "Absolutely! Just schedule a test ride from the vehicle’s page, and we’ll arrange it at your convenience—no hassle, no stress.",
   },
   {
-    question: "Can I test drive a car before buying?",
+    question: "Do you offer electric scooters or bikes?",
     answer:
-      "Absolutely! Schedule a test drive directly from the car's page, and our team will assist you with everything.",
+      "Yes! We list a wide range of electric two-wheelers from top EV brands. Filter by 'Electric' and explore models that fit your style and budget.",
   },
   {
-    question: "Are there financing options available?",
+    question: "Are helmets or accessories included with the purchase?",
     answer:
-      "Yes, we offer flexible financing options to make your dream car affordable. Connect with our team to know more.",
+      "Some dealers offer complimentary helmets or accessories. Details will be mentioned on the vehicle’s page. You can also add them while checking out.",
   },
   {
-    question: "How accurate are the vehicle details?",
+    question: "Is financing available for bikes and scooters?",
     answer:
-      "All listed vehicles are verified for accuracy and quality. We ensure transparent information and detailed reports.",
+      "Absolutely! We’ve partnered with top financial providers to offer easy EMI options for both scooters and bikes—apply directly from the platform.",
+  },
+  {
+    question: "How are the vehicles verified?",
+    answer:
+      "All bikes and scooters go through a detailed inspection process. We verify documents, service history, and physical condition for complete peace of mind.",
   },
 ];
 
 // FORM CONFIGURATION - Constants moved to a separate file for reusability
 
-export const fuelTypes = [
-  "Petrol",
-  "Diesel",
-  "Electric",
-  "Hybrid",
-  "Plug-in Hybrid",
-];
+export const fuelTypes = ["Petrol", "Electric", "Hybrid"];
 
 export const transmissions = ["Automatic", "Manual", "Semi-Automatic"];
 
-export const bodyTypesVal = [
-  "SUV",
-  "Sedan",
-  "Hatchback",
-  "Convertible",
-  "Coupe",
-  "Wagon",
-  "Pickup",
+export const bikeTypesVal = [
+  "Commuter",
+  "Cruiser",
+  "Sports",
+  "Scooter",
+  "Adventure",
+  "Tourer",
+  "Electric Scooter",
+  "Off-Road",
 ];
 
-export const carStatuses = ["AVAILABLE", "UNAVAILABLE", "SOLD"];
+export const rideStatuses = ["AVAILABLE", "UNAVAILABLE", "SOLD"];
 
 export const DAYS = [
   { value: "MONDAY", label: "Monday" },
