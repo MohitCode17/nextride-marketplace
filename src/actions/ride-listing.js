@@ -3,6 +3,7 @@
 import { serialzeRideData } from "@/lib/helpers";
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
 
 export async function getRideFilters() {
   try {

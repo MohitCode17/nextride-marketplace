@@ -1,16 +1,58 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "./ui/card";
 import { CarIcon, Heart, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { formatCurrency } from "@/lib/helpers";
+import { useAuth } from "@clerk/nextjs";
+import useFetch from "@/hooks/use-fetch";
+import { toggleSavedRide } from "@/actions/ride-listing";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const RideCard = ({ ride }) => {
+  const router = useRouter();
+  const { isSignedIn } = useAuth();
   const [isSaved, setIsSaved] = useState(ride.wishlisted);
-  const [isToggling, setIsToggling] = useState(false);
+
+  const {
+    loading: isToggling,
+    fn: toggleSavedRideFn,
+    data: toggleResult,
+    error: toggleError,
+  } = useFetch(toggleSavedRide);
+
+  // HANDLE TOGGLE RESULT
+  useEffect(() => {
+    if (toggleResult?.success && toggleResult.saved !== isSaved) {
+      setIsSaved(toggleResult.saved);
+      toast.success(toggleResult.message);
+    }
+  }, [toggleResult, isSaved]);
+
+  // HANDLE ERROR WITH USEEFFECT
+  useEffect(() => {
+    if (toggleError) {
+      toast.error("Failed to update favorites");
+    }
+  }, [toggleError]);
+
+  // HANDLE SAVE/UNSAVE CAR
+  const handleToggleSave = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isSignedIn) {
+      toast.error("Please sign in to save your rides");
+      router.push("/sign-in");
+      return;
+    }
+    if (isToggling) return;
+    await toggleSavedRideFn(ride.id);
+  };
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition group">
@@ -37,6 +79,8 @@ const RideCard = ({ ride }) => {
               ? "text-lime-500 hover:text-lime-700"
               : "text-gray-600 hover:text-gray-900"
           }`}
+          onClick={handleToggleSave}
+          disabled={isToggling}
         >
           {isToggling ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -78,7 +122,14 @@ const RideCard = ({ ride }) => {
         </div>
 
         <div className="flex justify-between">
-          <Button className={"flex-1"}>View Car</Button>
+          <Button
+            className={"flex-1"}
+            onClick={() => {
+              router.push(`/rides/${ride.id}`);
+            }}
+          >
+            View Car
+          </Button>
         </div>
       </CardContent>
     </Card>
