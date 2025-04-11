@@ -114,7 +114,7 @@ const RideCard = ({ ride }) => {
             {ride.bikeType}
           </Badge>
           <Badge variant={"outline"} className={"bg-lime-50 text-lime-900"}>
-            {ride.mileage.toLocaleString()}
+            {ride.mileage.toLocaleString()}kmpl
           </Badge>
           <Badge variant={"outline"} className={"bg-lime-50 text-lime-900"}>
             {ride.color}

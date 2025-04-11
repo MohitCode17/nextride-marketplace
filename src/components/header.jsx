@@ -64,7 +64,7 @@ const Header = async ({ isAdminPage = false }) => {
               )}
 
               <Link
-                href={"/saved-cars"}
+                href={"/saved-rides"}
                 className="text-gray-600 hover:text-teal-600 flex items-center gap-2"
               >
                 <Button>
