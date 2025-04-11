@@ -67,7 +67,7 @@ const RideCard = ({ ride }) => {
 
         <div className="flex flex-wrap gap-1 mb-4">
           <Badge variant={"outline"} className={"bg-lime-50 text-lime-900"}>
-            {ride.bodyType}
+            {ride.bikeType}
           </Badge>
           <Badge variant={"outline"} className={"bg-lime-50 text-lime-900"}>
             {ride.mileage.toLocaleString()}
