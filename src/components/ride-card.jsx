@@ -128,7 +128,7 @@ const RideCard = ({ ride }) => {
               router.push(`/rides/${ride.id}`);
             }}
           >
-            View Car
+            View Ride
           </Button>
         </div>
       </CardContent>
