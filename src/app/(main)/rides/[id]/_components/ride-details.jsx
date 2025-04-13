@@ -100,7 +100,15 @@ const RideDetails = ({ ride, testDriveInfo }) => {
   };
 
   // HANDLE BOOK TEST DRIVE
-  const handleBookTestDrive = () => {};
+  const handleBookTestDrive = () => {
+    if (!isSignedIn) {
+      toast.error("Please sign in to book a test drive");
+      router.push("/sign-in");
+      return;
+    }
+
+    router.push(`/test-drive/${ride.id}`);
+  };
 
   return (
     <div>
