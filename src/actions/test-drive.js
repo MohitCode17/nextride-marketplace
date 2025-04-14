@@ -98,7 +98,7 @@ export async function getUserTestDrives() {
     }
 
     // GET USER'S BOOKING
-    const bookings = await db.testDriveBooking.findUnique({
+    const bookings = await db.testDriveBooking.findMany({
       where: { userId: user.id },
       include: {
         ride: true,
@@ -167,7 +167,7 @@ export async function cancelTestDrive(bookingId) {
     }
 
     // CHECK IF USER OWNS THIS BOOKING
-    if (booking.userId !== user.id || user.role !== "ADMIN") {
+    if (booking.userId !== user.id && user.role !== "ADMIN") {
       return {
         success: false,
         error: "Unauthorized to cancel this booking",
