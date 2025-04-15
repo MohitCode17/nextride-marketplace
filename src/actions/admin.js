@@ -156,3 +156,122 @@ export async function updateTestDriveStatus(bookingId, newStatus) {
     throw new Error("Error updating test drive status:" + error.message);
   }
 }
+
+// DASHBOARD DATA
+export async function getDashboardData() {
+  try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+
+    if (!user || user.role !== "ADMIN") {
+      return {
+        success: false,
+        error: "Unauthorized",
+      };
+    }
+
+    const [rides, testDrives] = await Promise.all([
+      // GET ALL RIDES WITH MINIMAL FIELDS
+      db.ride.findMany({
+        select: {
+          id: true,
+          status: true,
+          featured: true,
+        },
+      }),
+
+      // GET ALL TEST DRIVES WITH MINIMAL FIEDLS
+      db.testDriveBooking.findMany({
+        select: {
+          id: true,
+          status: true,
+          rideId: true,
+        },
+      }),
+    ]);
+
+    // CALCULATE RIDE STATICS
+    const totalRides = rides.length;
+
+    const availableRides = rides.filter(
+      (ride) => ride.status === "AVAILABLE"
+    ).length;
+
+    const soldRides = rides.filter((ride) => ride.status === "SOLD").length;
+
+    const unavailableRides = rides.filter(
+      (ride) => ride.status === "UNAVAILABLE"
+    ).length;
+
+    const featuredRides = rides.filter((ride) => ride.featured === true).length;
+
+    // CALCULATE TEST DRIVE STATISTICS
+    const totalTestDrives = testDrives.length;
+
+    const pendingTestDrives = testDrives.filter(
+      (td) => td.status === "PENDING"
+    ).length;
+
+    const confirmedTestDrives = testDrives.filter(
+      (td) => td.status === "CONFIRMED"
+    ).length;
+
+    const completedTestDrives = testDrives.filter(
+      (td) => td.status === "COMPLETED"
+    ).length;
+
+    const cancelledTestDrives = testDrives.filter(
+      (td) => td.status === "CANCELLED"
+    ).length;
+
+    const noShowTestDrives = testDrives.filter(
+      (td) => td.status === "NO_SHOW"
+    ).length;
+
+    // CALCULATE TEST DRIVE CONVERSION RATE
+    const completedTestDriveRideIds = testDrives
+      .filter((td) => td.status === "COMPLETED")
+      .map((td) => td.rideId);
+
+    const soldRidesAfterTestDrive = rides.filter(
+      (ride) =>
+        ride.status === "SOLD" && completedTestDriveRideIds.includes(ride.id)
+    ).length;
+
+    const conversionRate =
+      completedTestDrives > 0
+        ? (soldRidesAfterTestDrive / completedTestDrives) * 100
+        : 0;
+
+    return {
+      success: true,
+      data: {
+        rides: {
+          total: totalRides,
+          available: availableRides,
+          sold: soldRides,
+          unavailable: unavailableRides,
+          featured: featuredRides,
+        },
+        testDrives: {
+          total: totalTestDrives,
+          pending: pendingTestDrives,
+          confirmed: confirmedTestDrives,
+          completed: completedTestDrives,
+          cancelled: cancelledTestDrives,
+          noShow: noShowTestDrives,
+          conversionRate: parseFloat(conversionRate.toFixed(2)),
+        },
+      },
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+}
