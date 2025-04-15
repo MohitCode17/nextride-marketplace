@@ -272,7 +272,7 @@ export async function getRideById(rideId) {
       };
     }
 
-    // CHECK IF CAR IS WISHLISTED BY USER
+    // CHECK IF CAR IS WISHLISTED BY USER (ONLY IF LOGGED IN)
     let isWishlisted = false;
 
     if (dbUser) {
@@ -288,26 +288,28 @@ export async function getRideById(rideId) {
       isWishlisted = !!savedRide;
     }
 
-    // CHECK IF USER HAS ALREADY BOOKED A TEST DRIVE FOR THIS RIDE
-    const existingTestDrive = await db.testDriveBooking.findFirst({
-      where: {
-        rideId,
-        userId: dbUser.id,
-        status: { in: ["PENDING", "CONFIRMED", "COMPLETED"] },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-
+    // CHECK IF USER HAS ALREADY BOOKED A TEST DRIVE (ONLY IF LOGGED IN)
     let userTestDrive = null;
 
-    if (existingTestDrive) {
-      userTestDrive = {
-        id: existingTestDrive.id,
-        status: existingTestDrive.status,
-        bookingDate: existingTestDrive.bookingDate.toISOString(),
-      };
+    if (dbUser) {
+      const existingTestDrive = await db.testDriveBooking.findFirst({
+        where: {
+          rideId,
+          userId: dbUser.id,
+          status: { in: ["PENDING", "CONFIRMED", "COMPLETED"] },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+
+      if (existingTestDrive) {
+        userTestDrive = {
+          id: existingTestDrive.id,
+          status: existingTestDrive.status,
+          bookingDate: existingTestDrive.bookingDate.toISOString(),
+        };
+      }
     }
 
     // GET DEALERSHIP INFO FOR TEST DRIVE AVAILABILITY
