@@ -147,7 +147,7 @@ export default async function Home() {
             {bodyTypes.map((type) => (
               <Link
                 key={type.name}
-                href={`rides?bodyType=${type.name}`}
+                href={`rides?bikeType=${type.name}`}
                 className="relative group rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all"
               >
                 <div className="h-40 relative">
