@@ -1,4 +1,6 @@
+import arcjet, { createMiddleware, detectBot, shield } from "@arcjet/next";
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
 const isProtectedRoute = createRouteMatcher([
   "/admin(.*)",
@@ -6,8 +8,26 @@ const isProtectedRoute = createRouteMatcher([
   "/reservations(.*)",
 ]);
 
+// CREATE ARCJET MIDDLEWARE
+const aj = arcjet({
+  key: process.env.ARCJET_KEY,
+  rules: [
+    // SHIELD PROTECTION FOR CONTENT AND SECURITY
+    shield({
+      mode: "LIVE",
+    }),
+    detectBot({
+      mode: "LIVE",
+      allow: [
+        "CATEGORY:SEARCH_ENGINE", // Google, Bing, etc
+        // See the full list at https://arcjet.com/bot-list
+      ],
+    }),
+  ],
+});
+
 // CREATE BASE CLERK MIDDLEWARE
-export default clerkMiddleware(async (auth, req) => {
+const clerk = clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
 
   // IF USER IS NOT LOGGED IN, BUT ARE ON ANY OF PROTECTED ROUTE
@@ -15,7 +35,12 @@ export default clerkMiddleware(async (auth, req) => {
     const { redirectToSignIn } = await auth();
     return redirectToSignIn();
   }
+
+  return NextResponse.next();
 });
+
+// CHAIN MIDDLEWARE
+export default createMiddleware(aj, clerk);
 
 export const config = {
   matcher: [
