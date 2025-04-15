@@ -17,6 +17,7 @@ const RideCard = ({ ride }) => {
   const router = useRouter();
   const { isSignedIn } = useAuth();
   const [isSaved, setIsSaved] = useState(ride.wishlisted);
+  const [loading, setLoading] = useState(false);
 
   const {
     loading: isToggling,
@@ -52,6 +53,12 @@ const RideCard = ({ ride }) => {
     }
     if (isToggling) return;
     await toggleSavedRideFn(ride.id);
+  };
+
+  // HANDLE VIEW RIDE DETAILS
+  const handleViewRide = () => {
+    setLoading(true);
+    router.push(`/rides/${ride.id}`);
   };
 
   return (
@@ -123,12 +130,15 @@ const RideCard = ({ ride }) => {
 
         <div className="flex justify-between">
           <Button
-            className={"flex-1"}
-            onClick={() => {
-              router.push(`/rides/${ride.id}`);
-            }}
+            className="flex-1"
+            onClick={handleViewRide}
+            disabled={loading}
           >
-            View Ride
+            {loading ? (
+              <Loader2 className="animate-spin h-4 w-4" />
+            ) : (
+              "View Ride"
+            )}
           </Button>
         </div>
       </CardContent>
