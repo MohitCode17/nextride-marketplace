@@ -68,7 +68,7 @@ const HomeSearch = () => {
       return;
     }
 
-    router.push(`/cars?search=${encodeURIComponent(searchTerm)}`);
+    router.push(`/rides?search=${encodeURIComponent(searchTerm)}`);
   };
 
   const handleImageSearch = async (e) => {
@@ -97,7 +97,7 @@ const HomeSearch = () => {
         params.set("color", processResult.data.color);
 
       // Redirect to search results
-      router.push(`/cars?${params.toString()}`);
+      router.push(`/rides?${params.toString()}`);
     }
   }, [processResult, router]);
 
