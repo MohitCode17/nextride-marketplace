@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "@/components/header";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
+import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,7 +25,11 @@ export default function RootLayout({ children }) {
             <div className="container mx-auto text-center text-gray-600 px-4 text-sm">
               <p>
                 Made with <span className="text-pink-500">❤️</span> by{" "}
-                <span className="text-teal-600 font-semibold">MohitCodes</span>
+                <span className="text-teal-600 font-semibold">
+                  <Link href={"https://github.com/MohitCode17"} target="_blank">
+                    Mohit Gupta
+                  </Link>
+                </span>
               </p>
             </div>
           </footer>
