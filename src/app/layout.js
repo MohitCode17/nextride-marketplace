@@ -25,11 +25,7 @@ export default function RootLayout({ children }) {
             <div className="container mx-auto text-center text-gray-600 px-4 text-sm">
               <p>
                 Made with <span className="text-pink-500">❤️</span> by{" "}
-                <span className="text-teal-600 font-semibold">
-                  <Link href={"https://github.com/MohitCode17"} target="_blank">
-                    Mohit Gupta
-                  </Link>
-                </span>
+                <span className="text-teal-600 font-semibold">Mohit Gupta</span>
               </p>
             </div>
           </footer>
